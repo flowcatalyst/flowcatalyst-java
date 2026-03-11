@@ -64,8 +64,8 @@ public class ServiceAccountReadRepository implements ServiceAccountRepository {
         // Service accounts that have the given clientId in their clientIds list
         @SuppressWarnings("unchecked")
         List<ServiceAccountJpaEntity> results = em.createNativeQuery(
-                "SELECT sa.* FROM service_accounts sa " +
-                "JOIN service_account_client_ids saci ON sa.id = saci.service_account_id " +
+                "SELECT sa.* FROM iam_service_accounts sa " +
+                "JOIN iam_service_account_client_ids saci ON sa.id = saci.service_account_id " +
                 "WHERE saci.client_id = :clientId",
                 ServiceAccountJpaEntity.class)
             .setParameter("clientId", clientId)

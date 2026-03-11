@@ -44,6 +44,7 @@ public final class DispatchJobMapper {
         job.correlationId = entity.correlationId;
         job.metadata = parseMetadataJson(entity.metadataJson);
         job.targetUrl = entity.targetUrl;
+        job.connectionId = entity.connectionId;
         job.protocol = entity.protocol;
         job.payload = entity.payload;
         job.payloadContentType = entity.payloadContentType;
@@ -94,6 +95,7 @@ public final class DispatchJobMapper {
         entity.correlationId = domain.correlationId;
         entity.metadataJson = serializeMetadata(domain.metadata);
         entity.targetUrl = domain.targetUrl;
+        entity.connectionId = domain.connectionId;
         entity.protocol = domain.protocol;
         entity.payload = domain.payload;
         entity.payloadContentType = domain.payloadContentType;
@@ -137,6 +139,7 @@ public final class DispatchJobMapper {
         entity.correlationId = domain.correlationId;
         entity.metadataJson = serializeMetadata(domain.metadata);
         entity.targetUrl = domain.targetUrl;
+        entity.connectionId = domain.connectionId;
         entity.protocol = domain.protocol;
         entity.payload = domain.payload;
         entity.payloadContentType = domain.payloadContentType;

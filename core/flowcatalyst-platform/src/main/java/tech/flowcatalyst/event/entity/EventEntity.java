@@ -12,7 +12,7 @@ import java.time.Instant;
  * JPA entity for events table.
  */
 @Entity
-@Table(name = "events")
+@Table(name = "msg_events")
 public class EventEntity {
 
     @Id

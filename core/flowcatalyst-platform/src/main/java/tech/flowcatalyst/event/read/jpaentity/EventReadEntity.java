@@ -8,7 +8,7 @@ import java.time.Instant;
  * JPA Entity for events_read table (read-optimized projection).
  */
 @Entity
-@Table(name = "events_read")
+@Table(name = "msg_events_read")
 public class EventReadEntity {
 
     @Id

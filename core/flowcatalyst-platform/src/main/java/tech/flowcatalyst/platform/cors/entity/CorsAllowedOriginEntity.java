@@ -10,7 +10,7 @@ import java.time.Instant;
  * JPA entity for cors_allowed_origins table.
  */
 @Entity
-@Table(name = "cors_allowed_origins")
+@Table(name = "tnt_cors_allowed_origins")
 public class CorsAllowedOriginEntity {
 
     @Id

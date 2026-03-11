@@ -10,7 +10,7 @@ import java.time.Instant;
  * JPA entity for idp_role_mappings table.
  */
 @Entity
-@Table(name = "idp_role_mappings")
+@Table(name = "oauth_idp_role_mappings")
 public class IdpRoleMappingEntity {
 
     @Id

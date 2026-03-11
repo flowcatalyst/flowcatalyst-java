@@ -19,7 +19,7 @@ import java.util.Set;
  * JPA entity for auth_roles table.
  */
 @Entity
-@Table(name = "auth_roles")
+@Table(name = "iam_roles")
 public class AuthRoleEntity {
 
     @Id
@@ -42,7 +42,7 @@ public class AuthRoleEntity {
     public String description;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))
+    @CollectionTable(name = "iam_role_permissions", joinColumns = @JoinColumn(name = "role_id"))
     @Column(name = "permission")
     public Set<String> permissions = new HashSet<>();
 

@@ -12,6 +12,7 @@ import tech.flowcatalyst.dispatchjob.model.DispatchKind;
 import tech.flowcatalyst.dispatchjob.model.DispatchStatus;
 import tech.flowcatalyst.dispatchjob.model.MediationType;
 import tech.flowcatalyst.dispatchjob.model.MessagePointer;
+import tech.flowcatalyst.connection.entity.ConnectionEntity;
 import tech.flowcatalyst.dispatchjob.queue.DispatchQueue;
 import tech.flowcatalyst.dispatchjob.queue.DispatchQueueConfig;
 import tech.flowcatalyst.dispatchjob.repository.DispatchJobRepository;
@@ -23,6 +24,8 @@ import tech.flowcatalyst.queue.QueuePublishResult;
 import tech.flowcatalyst.queue.QueuePublisher;
 import tech.flowcatalyst.subscription.SubscriptionCache;
 import tech.flowcatalyst.subscription.SubscriptionCache.CachedSubscription;
+
+import jakarta.persistence.EntityManager;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -55,6 +58,9 @@ public class EventDispatchService {
 
     @Inject
     SubscriptionCache subscriptionCache;
+
+    @Inject
+    EntityManager em;
 
     @Inject
     DispatchJobRepository dispatchJobRepository;
@@ -224,6 +230,11 @@ public class EventDispatchService {
     private DispatchJob createDispatchJob(Event event, CachedSubscription sub) {
         Instant now = Instant.now();
 
+        // Resolve connection for target URL and service account
+        ConnectionEntity connection = sub.connectionId() != null
+            ? em.find(ConnectionEntity.class, sub.connectionId())
+            : null;
+
         DispatchJob job = new DispatchJob();
         job.id = TsidGenerator.generate(EntityType.DISPATCH_JOB);
         job.kind = DispatchKind.EVENT;
@@ -232,10 +243,11 @@ public class EventDispatchService {
         job.subject = event.subject();
         job.eventId = event.id();
         job.correlationId = event.correlationId();
-        job.targetUrl = sub.target();
+        job.connectionId = sub.connectionId();
+        job.targetUrl = connection != null ? connection.endpoint : null;
+        job.serviceAccountId = connection != null ? connection.serviceAccountId : null;
         job.payload = formatPayload(event, sub);
         job.payloadContentType = "application/json";
-        job.serviceAccountId = sub.serviceAccountId();
         job.clientId = sub.clientId();
         job.subscriptionId = sub.id();
         job.idempotencyKey = event.id() + ":" + sub.id();

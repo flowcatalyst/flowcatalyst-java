@@ -14,5 +14,5 @@ enum EventTypeStatus: string
     /**
      * Archived event type (soft-deleted).
      */
-    case ARCHIVE = 'ARCHIVE';
+    case ARCHIVED = 'ARCHIVED';
 }

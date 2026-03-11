@@ -15,7 +15,7 @@ import java.time.Instant;
  * JPA entity for clients table.
  */
 @Entity
-@Table(name = "clients")
+@Table(name = "tnt_clients")
 public class ClientEntity {
 
     @Id

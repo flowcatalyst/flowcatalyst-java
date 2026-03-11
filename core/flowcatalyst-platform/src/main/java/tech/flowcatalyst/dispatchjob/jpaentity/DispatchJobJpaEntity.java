@@ -14,7 +14,7 @@ import java.time.Instant;
  * JPA Entity for dispatch_jobs table.
  */
 @Entity
-@Table(name = "dispatch_jobs")
+@Table(name = "msg_dispatch_jobs")
 public class DispatchJobJpaEntity {
 
     @Id
@@ -25,7 +25,7 @@ public class DispatchJobJpaEntity {
     public String externalId;
 
     // Classification Fields
-    @Column(name = "source", length = 100)
+    @Column(name = "source", length = 500)
     public String source;
 
     @Enumerated(EnumType.STRING)
@@ -35,7 +35,7 @@ public class DispatchJobJpaEntity {
     @Column(name = "code", nullable = false, length = 200)
     public String code;
 
-    @Column(name = "subject", length = 200)
+    @Column(name = "subject", length = 500)
     public String subject;
 
     @Column(name = "event_id", length = 13)
@@ -50,8 +50,11 @@ public class DispatchJobJpaEntity {
     public String metadataJson;
 
     // Target Information
-    @Column(name = "target_url", nullable = false, length = 2048)
+    @Column(name = "target_url", length = 500)
     public String targetUrl;
+
+    @Column(name = "connection_id", length = 17)
+    public String connectionId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "protocol", nullable = false, length = 30)

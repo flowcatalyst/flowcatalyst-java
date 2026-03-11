@@ -34,7 +34,7 @@ public final class SubscriptionMapper {
             .clientIdentifier(entity.clientIdentifier)
             .clientScoped(entity.clientScoped)
             .eventTypes(new ArrayList<>()) // loaded separately
-            .target(entity.target)
+            .connectionId(entity.connectionId)
             .queue(entity.queue)
             .customConfig(new ArrayList<>()) // loaded separately
             .source(entity.source)
@@ -47,7 +47,6 @@ public final class SubscriptionMapper {
             .mode(entity.mode)
             .timeoutSeconds(entity.timeoutSeconds)
             .maxRetries(entity.maxRetries)
-            .serviceAccountId(entity.serviceAccountId)
             .dataOnly(entity.dataOnly)
             .createdAt(entity.createdAt)
             .updatedAt(entity.updatedAt)
@@ -71,7 +70,7 @@ public final class SubscriptionMapper {
         entity.clientId = domain.clientId();
         entity.clientIdentifier = domain.clientIdentifier();
         entity.clientScoped = domain.clientScoped();
-        entity.target = domain.target();
+        entity.connectionId = domain.connectionId();
         entity.queue = domain.queue();
         entity.source = domain.source();
         entity.status = domain.status();
@@ -83,7 +82,6 @@ public final class SubscriptionMapper {
         entity.mode = domain.mode();
         entity.timeoutSeconds = domain.timeoutSeconds();
         entity.maxRetries = domain.maxRetries();
-        entity.serviceAccountId = domain.serviceAccountId();
         entity.dataOnly = domain.dataOnly();
         entity.createdAt = domain.createdAt();
         entity.updatedAt = domain.updatedAt();
@@ -101,7 +99,7 @@ public final class SubscriptionMapper {
         entity.description = domain.description();
         entity.clientId = domain.clientId();
         entity.clientIdentifier = domain.clientIdentifier();
-        entity.target = domain.target();
+        entity.connectionId = domain.connectionId();
         entity.queue = domain.queue();
         entity.source = domain.source();
         entity.status = domain.status();
@@ -113,7 +111,6 @@ public final class SubscriptionMapper {
         entity.mode = domain.mode();
         entity.timeoutSeconds = domain.timeoutSeconds();
         entity.maxRetries = domain.maxRetries();
-        entity.serviceAccountId = domain.serviceAccountId();
         entity.dataOnly = domain.dataOnly();
         entity.updatedAt = domain.updatedAt();
     }

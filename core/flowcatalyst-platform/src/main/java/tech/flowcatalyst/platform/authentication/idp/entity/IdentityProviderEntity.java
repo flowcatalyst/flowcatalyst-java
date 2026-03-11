@@ -20,7 +20,7 @@ import java.util.List;
  * JPA entity for identity_providers table.
  */
 @Entity
-@Table(name = "identity_providers")
+@Table(name = "oauth_identity_providers")
 public class IdentityProviderEntity {
 
     @Id
@@ -54,7 +54,7 @@ public class IdentityProviderEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "identity_provider_allowed_domains",
+        name = "oauth_identity_provider_allowed_domains",
         joinColumns = @JoinColumn(name = "identity_provider_id")
     )
     @Column(name = "email_domain", length = 255)

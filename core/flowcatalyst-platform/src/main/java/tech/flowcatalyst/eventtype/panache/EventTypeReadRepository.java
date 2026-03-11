@@ -6,7 +6,9 @@ import jakarta.persistence.EntityManager;
 import tech.flowcatalyst.eventtype.EventType;
 import tech.flowcatalyst.eventtype.EventTypeRepository;
 import tech.flowcatalyst.eventtype.EventTypeStatus;
+import tech.flowcatalyst.eventtype.SpecVersion;
 import tech.flowcatalyst.eventtype.entity.EventTypeEntity;
+import tech.flowcatalyst.eventtype.entity.EventTypeSpecVersionEntity;
 import tech.flowcatalyst.eventtype.mapper.EventTypeMapper;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
     @Override
     public Optional<EventType> findByIdOptional(String id) {
         EventTypeEntity entity = em.find(EventTypeEntity.class, id);
-        return Optional.ofNullable(entity).map(EventTypeMapper::toDomain);
+        return Optional.ofNullable(entity).map(this::toDomainWithSpecVersions);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
         var results = em.createQuery("FROM EventTypeEntity WHERE code = :code", EventTypeEntity.class)
             .setParameter("code", code)
             .getResultList();
-        return results.isEmpty() ? Optional.empty() : Optional.of(EventTypeMapper.toDomain(results.get(0)));
+        return results.isEmpty() ? Optional.empty() : Optional.of(toDomainWithSpecVersions(results.get(0)));
     }
 
     @Override
@@ -49,7 +51,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
         return em.createQuery("FROM EventTypeEntity ORDER BY code", EventTypeEntity.class)
             .getResultList()
             .stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
@@ -59,17 +61,17 @@ public class EventTypeReadRepository implements EventTypeRepository {
             .setParameter("status", EventTypeStatus.CURRENT)
             .getResultList()
             .stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
     @Override
     public List<EventType> findArchived() {
         return em.createQuery("FROM EventTypeEntity WHERE status = :status", EventTypeEntity.class)
-            .setParameter("status", EventTypeStatus.ARCHIVE)
+            .setParameter("status", EventTypeStatus.ARCHIVED)
             .getResultList()
             .stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
@@ -79,7 +81,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
             .setParameter("prefix", prefix + "%")
             .getResultList()
             .stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
@@ -88,7 +90,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
         return em.createQuery("FROM EventTypeEntity", EventTypeEntity.class)
             .getResultList()
             .stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
@@ -218,7 +220,7 @@ public class EventTypeReadRepository implements EventTypeRepository {
         }
 
         return query.getResultList().stream()
-            .map(EventTypeMapper::toDomain)
+            .map(this::toDomainWithSpecVersions)
             .toList();
     }
 
@@ -241,5 +243,25 @@ public class EventTypeReadRepository implements EventTypeRepository {
     @Override
     public boolean deleteById(String id) {
         return writeRepo.deleteEventTypeById(id);
+    }
+
+    // ========================================================================
+    // Helper Methods
+    // ========================================================================
+
+    private EventType toDomainWithSpecVersions(EventTypeEntity entity) {
+        EventType base = EventTypeMapper.toDomain(entity);
+
+        // Load spec versions from separate table
+        List<EventTypeSpecVersionEntity> specVersionEntities = em.createQuery(
+                "FROM EventTypeSpecVersionEntity WHERE eventTypeId = :id ORDER BY version ASC",
+                EventTypeSpecVersionEntity.class)
+            .setParameter("id", entity.id)
+            .getResultList();
+        List<SpecVersion> specVersions = EventTypeMapper.toSpecVersions(specVersionEntities);
+
+        return base.toBuilder()
+            .specVersions(specVersions)
+            .build();
     }
 }

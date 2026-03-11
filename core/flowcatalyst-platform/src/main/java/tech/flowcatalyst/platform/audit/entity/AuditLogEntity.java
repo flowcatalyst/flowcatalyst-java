@@ -12,7 +12,7 @@ import java.time.Instant;
  * JPA entity for audit_logs table.
  */
 @Entity
-@Table(name = "audit_logs")
+@Table(name = "aud_logs")
 public class AuditLogEntity {
 
     @Id

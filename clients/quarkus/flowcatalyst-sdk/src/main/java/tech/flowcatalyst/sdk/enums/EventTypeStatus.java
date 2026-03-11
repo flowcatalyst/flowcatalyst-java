@@ -5,5 +5,5 @@ package tech.flowcatalyst.sdk.enums;
  */
 public enum EventTypeStatus {
     CURRENT,
-    ARCHIVE
+    ARCHIVED
 }

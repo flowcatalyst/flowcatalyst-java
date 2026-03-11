@@ -158,7 +158,7 @@ public class SubscriptionResource {
             request.clientScoped(),
             request.clientId(),
             request.eventTypes(),
-            request.target(),
+            request.connectionId(),
             request.queue(),
             request.customConfig(),
             request.source(),
@@ -169,7 +169,6 @@ public class SubscriptionResource {
             request.mode(),
             request.timeoutSeconds(),
             request.maxRetries(),
-            request.serviceAccountId(),
             request.dataOnly()
         );
 
@@ -223,7 +222,7 @@ public class SubscriptionResource {
             request.name(),
             request.description(),
             request.eventTypes(),
-            request.target(),
+            request.connectionId(),
             request.queue(),
             request.customConfig(),
             request.status(),
@@ -234,7 +233,6 @@ public class SubscriptionResource {
             request.mode(),
             request.timeoutSeconds(),
             request.maxRetries(),
-            request.serviceAccountId(),
             request.dataOnly()
         );
 
@@ -322,7 +320,7 @@ public class SubscriptionResource {
 
         UpdateSubscriptionCommand command = new UpdateSubscriptionCommand(
             id, null, null, null, null, null, null,
-            SubscriptionStatus.PAUSED, null, null, null, null, null, null, null, null, null
+            SubscriptionStatus.PAUSED, null, null, null, null, null, null, null, null
         );
 
         ExecutionContext ctx = ExecutionContext.create(principalId);
@@ -364,7 +362,7 @@ public class SubscriptionResource {
 
         UpdateSubscriptionCommand command = new UpdateSubscriptionCommand(
             id, null, null, null, null, null, null,
-            SubscriptionStatus.ACTIVE, null, null, null, null, null, null, null, null, null
+            SubscriptionStatus.ACTIVE, null, null, null, null, null, null, null, null
         );
 
         ExecutionContext ctx = ExecutionContext.create(principalId);
@@ -400,7 +398,7 @@ public class SubscriptionResource {
             subscription.clientId(),
             subscription.clientIdentifier(),
             subscription.eventTypes(),
-            subscription.target(),
+            subscription.connectionId(),
             subscription.queue(),
             subscription.customConfig(),
             subscription.source(),
@@ -413,7 +411,6 @@ public class SubscriptionResource {
             subscription.mode(),
             subscription.timeoutSeconds(),
             subscription.maxRetries(),
-            subscription.serviceAccountId(),
             subscription.dataOnly(),
             subscription.createdAt(),
             subscription.updatedAt()
@@ -432,7 +429,7 @@ public class SubscriptionResource {
         String clientId,
         String clientIdentifier,
         List<EventTypeBinding> eventTypes,
-        String target,
+        String connectionId,
         String queue,
         List<ConfigEntry> customConfig,
         SubscriptionSource source,
@@ -445,7 +442,6 @@ public class SubscriptionResource {
         DispatchMode mode,
         int timeoutSeconds,
         int maxRetries,
-        String serviceAccountId,
         boolean dataOnly,
         Instant createdAt,
         Instant updatedAt
@@ -476,8 +472,8 @@ public class SubscriptionResource {
         @NotEmpty(message = "At least one event type is required")
         List<EventTypeBinding> eventTypes,
 
-        @NotBlank(message = "Target URL is required")
-        String target,
+        @NotBlank(message = "Connection ID is required")
+        String connectionId,
 
         @NotBlank(message = "Queue name is required")
         String queue,
@@ -506,9 +502,6 @@ public class SubscriptionResource {
         @Min(value = 0, message = "Max retries cannot be negative")
         Integer maxRetries,
 
-        @NotBlank(message = "Service account ID is required")
-        String serviceAccountId,
-
         Boolean dataOnly
     ) {}
 
@@ -520,7 +513,7 @@ public class SubscriptionResource {
 
         List<EventTypeBinding> eventTypes,
 
-        String target,
+        String connectionId,
 
         String queue,
 
@@ -546,8 +539,6 @@ public class SubscriptionResource {
 
         @Min(value = 0, message = "Max retries cannot be negative")
         Integer maxRetries,
-
-        String serviceAccountId,
 
         Boolean dataOnly
     ) {}

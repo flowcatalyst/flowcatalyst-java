@@ -17,7 +17,7 @@ import java.util.List;
  * @param clientScoped Whether this subscription is scoped to clients (must match event types)
  * @param clientId Client ID (nullable - null means "all clients" when clientScoped=true, must be null when clientScoped=false)
  * @param eventTypes List of event type bindings
- * @param target Target URL for dispatching
+ * @param connectionId Connection ID for endpoint and credentials
  * @param queue Queue name
  * @param customConfig Custom configuration JSON
  * @param source How this subscription was created
@@ -28,7 +28,6 @@ import java.util.List;
  * @param mode Processing mode
  * @param timeoutSeconds Timeout for dispatch target
  * @param maxRetries Maximum retry attempts for failed dispatch jobs
- * @param serviceAccountId Service account ID for webhook credentials
  * @param dataOnly If true, send raw payload only; if false, wrap in JSON envelope
  */
 public record CreateSubscriptionCommand(
@@ -39,7 +38,7 @@ public record CreateSubscriptionCommand(
     boolean clientScoped,
     String clientId,
     List<EventTypeBinding> eventTypes,
-    String target,
+    String connectionId,
     String queue,
     List<ConfigEntry> customConfig,
     SubscriptionSource source,
@@ -50,6 +49,5 @@ public record CreateSubscriptionCommand(
     DispatchMode mode,
     Integer timeoutSeconds,
     Integer maxRetries,
-    String serviceAccountId,
     Boolean dataOnly
 ) {}

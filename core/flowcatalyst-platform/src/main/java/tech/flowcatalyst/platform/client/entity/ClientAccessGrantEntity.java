@@ -11,7 +11,7 @@ import java.time.Instant;
  * JPA entity for client_access_grants table.
  */
 @Entity
-@Table(name = "client_access_grants",
+@Table(name = "iam_client_access_grants",
     uniqueConstraints = @UniqueConstraint(columnNames = {"principal_id", "client_id"}))
 public class ClientAccessGrantEntity {
 

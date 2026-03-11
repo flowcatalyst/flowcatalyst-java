@@ -200,7 +200,7 @@ public class ApplicationSubscriptionResource {
             item.description(),
             item.clientScoped(),
             bindings,
-            item.target(),
+            item.connectionId(),
             item.queue(),
             item.customConfig(),
             item.maxAgeSeconds(),
@@ -242,7 +242,7 @@ public class ApplicationSubscriptionResource {
             sub.name(),
             sub.description(),
             eventTypes,
-            sub.target(),
+            sub.connectionId(),
             sub.queue(),
             sub.customConfig(),
             sub.source() != null ? sub.source().name() : "API",
@@ -255,7 +255,6 @@ public class ApplicationSubscriptionResource {
             sub.mode(),
             sub.timeoutSeconds(),
             sub.maxRetries(),
-            sub.serviceAccountId(),
             sub.dataOnly()
         );
     }
@@ -269,7 +268,7 @@ public class ApplicationSubscriptionResource {
         String name,
         String description,
         List<EventTypeBindingDto> eventTypes,
-        String target,
+        String connectionId,
         String queue,
         List<ConfigEntry> customConfig,
         String source,
@@ -282,7 +281,6 @@ public class ApplicationSubscriptionResource {
         DispatchMode mode,
         int timeoutSeconds,
         int maxRetries,
-        String serviceAccountId,
         boolean dataOnly
     ) {}
 
@@ -303,7 +301,7 @@ public class ApplicationSubscriptionResource {
         String description,
         Boolean clientScoped,
         List<EventTypeBindingItem> eventTypes,
-        String target,
+        String connectionId,
         String queue,
         List<ConfigEntry> customConfig,
         Integer maxAgeSeconds,

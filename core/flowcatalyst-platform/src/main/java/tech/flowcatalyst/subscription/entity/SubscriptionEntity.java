@@ -11,7 +11,7 @@ import java.time.Instant;
  * JPA Entity for Subscription.
  */
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "msg_subscriptions")
 public class SubscriptionEntity {
 
     @Id
@@ -24,10 +24,10 @@ public class SubscriptionEntity {
     @Column(name = "application_code", length = 100)
     public String applicationCode;
 
-    @Column(name = "name", nullable = false, length = 200)
+    @Column(name = "name", nullable = false, length = 255)
     public String name;
 
-    @Column(name = "description", length = 1000)
+    @Column(name = "description", columnDefinition = "TEXT")
     public String description;
 
     @Column(name = "client_id", length = 17)
@@ -39,10 +39,10 @@ public class SubscriptionEntity {
     @Column(name = "client_scoped", nullable = false)
     public boolean clientScoped;
 
-    @Column(name = "target", nullable = false, length = 500)
-    public String target;
+    @Column(name = "connection_id", nullable = false, length = 17)
+    public String connectionId;
 
-    @Column(name = "queue", length = 200)
+    @Column(name = "queue", length = 255)
     public String queue;
 
     @Enumerated(EnumType.STRING)
@@ -77,9 +77,6 @@ public class SubscriptionEntity {
 
     @Column(name = "max_retries", nullable = false)
     public int maxRetries;
-
-    @Column(name = "service_account_id", length = 17)
-    public String serviceAccountId;
 
     @Column(name = "data_only", nullable = false)
     public boolean dataOnly;

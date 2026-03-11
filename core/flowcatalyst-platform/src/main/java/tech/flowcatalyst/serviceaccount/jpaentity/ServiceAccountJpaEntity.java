@@ -11,7 +11,7 @@ import java.time.Instant;
  * Webhook credentials are stored as embedded columns.
  */
 @Entity
-@Table(name = "service_accounts")
+@Table(name = "iam_service_accounts")
 public class ServiceAccountJpaEntity {
 
     @Id

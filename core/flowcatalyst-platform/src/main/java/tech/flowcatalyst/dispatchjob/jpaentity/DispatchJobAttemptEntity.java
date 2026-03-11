@@ -13,7 +13,7 @@ import java.time.Instant;
  * making records a good fit. Hibernate 6+ supports records as entities.
  */
 @Entity
-@Table(name = "dispatch_job_attempts")
+@Table(name = "msg_dispatch_job_attempts")
 public record DispatchJobAttemptEntity(
     @Id
     @Column(name = "id", length = 17)

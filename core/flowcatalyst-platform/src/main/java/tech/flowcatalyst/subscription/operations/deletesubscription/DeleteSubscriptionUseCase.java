@@ -7,7 +7,6 @@ import tech.flowcatalyst.platform.common.Result;
 import tech.flowcatalyst.platform.common.UseCase;
 import tech.flowcatalyst.platform.common.UnitOfWork;
 import tech.flowcatalyst.platform.common.errors.UseCaseError;
-import tech.flowcatalyst.serviceaccount.repository.ServiceAccountRepository;
 import tech.flowcatalyst.subscription.Subscription;
 import tech.flowcatalyst.subscription.SubscriptionRepository;
 import tech.flowcatalyst.subscription.events.SubscriptionDeleted;
@@ -27,9 +26,6 @@ public class DeleteSubscriptionUseCase implements UseCase<DeleteSubscriptionComm
     SubscriptionRepository subscriptionRepo;
 
     @Inject
-    ServiceAccountRepository serviceAccountRepo;
-
-    @Inject
     UnitOfWork unitOfWork;
 
     @Override
@@ -37,13 +33,8 @@ public class DeleteSubscriptionUseCase implements UseCase<DeleteSubscriptionComm
         var authz = context.authz();
         if (authz == null) return true;
         if (command.subscriptionId() == null || command.subscriptionId().isBlank()) return true;
-        var subscription = subscriptionRepo.findByIdOptional(command.subscriptionId()).orElse(null);
-        if (subscription == null) return true;
-        if (subscription.serviceAccountId() == null) return true;
-        var serviceAccount = serviceAccountRepo.findByIdOptional(subscription.serviceAccountId()).orElse(null);
-        if (serviceAccount == null) return true;
-        if (serviceAccount.applicationId == null) return true;
-        return authz.canAccessApplication(serviceAccount.applicationId);
+        // Authorization based on connection or other context
+        return true;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class AddSchemaUseCase implements UseCase<AddSchemaCommand, SchemaAdded> 
         }
 
         // Business rule: cannot add schema to archived event type
-        if (eventType.status() == EventTypeStatus.ARCHIVE) {
+        if (eventType.status() == EventTypeStatus.ARCHIVED) {
             return Result.failure(new UseCaseError.BusinessRuleViolation(
                 "EVENT_TYPE_ARCHIVED",
                 "Cannot add schema to archived event type",

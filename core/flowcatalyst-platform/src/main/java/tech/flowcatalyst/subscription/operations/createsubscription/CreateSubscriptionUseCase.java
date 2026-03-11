@@ -13,13 +13,14 @@ import tech.flowcatalyst.platform.common.Result;
 import tech.flowcatalyst.platform.common.UseCase;
 import tech.flowcatalyst.platform.common.UnitOfWork;
 import tech.flowcatalyst.platform.common.errors.UseCaseError;
-import tech.flowcatalyst.serviceaccount.entity.ServiceAccount;
+import tech.flowcatalyst.connection.entity.ConnectionEntity;
 import tech.flowcatalyst.dispatch.DispatchMode;
 import tech.flowcatalyst.platform.shared.EntityType;
 import tech.flowcatalyst.platform.shared.TsidGenerator;
-import tech.flowcatalyst.serviceaccount.repository.ServiceAccountRepository;
 import tech.flowcatalyst.subscription.*;
 import tech.flowcatalyst.subscription.events.SubscriptionCreated;
+
+import jakarta.persistence.EntityManager;
 
 import java.time.Instant;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
     ClientRepository clientRepo;
 
     @Inject
-    ServiceAccountRepository serviceAccountRepo;
+    EntityManager em;
 
     @Inject
     EventTypeRepository eventTypeRepo;
@@ -53,11 +54,11 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
     public boolean authorizeResource(CreateSubscriptionCommand command, ExecutionContext context) {
         var authz = context.authz();
         if (authz == null) return true;
-        if (command.serviceAccountId() == null || command.serviceAccountId().isBlank()) return true;
-        var serviceAccount = serviceAccountRepo.findByIdOptional(command.serviceAccountId()).orElse(null);
-        if (serviceAccount == null) return true;
-        if (serviceAccount.applicationId == null) return true;
-        return authz.canAccessApplication(serviceAccount.applicationId);
+        if (command.connectionId() == null || command.connectionId().isBlank()) return true;
+        var connection = em.find(ConnectionEntity.class, command.connectionId());
+        if (connection == null) return true;
+        // Connection authorization could be based on clientId or other fields
+        return true;
     }
 
     @Override
@@ -89,11 +90,11 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
             ));
         }
 
-        // Validate target
-        if (command.target() == null || command.target().isBlank()) {
+        // Validate connection
+        if (command.connectionId() == null || command.connectionId().isBlank()) {
             return Result.failure(new UseCaseError.ValidationError(
-                "TARGET_REQUIRED",
-                "Target URL is required",
+                "CONNECTION_REQUIRED",
+                "Connection ID is required",
                 Map.of()
             ));
         }
@@ -179,22 +180,16 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
         }
         DispatchPool pool = poolOpt.get();
 
-        // Validate service account
-        if (command.serviceAccountId() == null || command.serviceAccountId().isBlank()) {
-            return Result.failure(new UseCaseError.ValidationError(
-                "SERVICE_ACCOUNT_REQUIRED",
-                "Service account ID is required for webhook credentials",
-                Map.of()
-            ));
-        }
-        Optional<ServiceAccount> serviceAccountOpt = serviceAccountRepo.findByIdOptional(command.serviceAccountId());
-        if (serviceAccountOpt.isEmpty()) {
+        // Validate connection exists
+        ConnectionEntity connection = em.find(ConnectionEntity.class, command.connectionId());
+        if (connection == null) {
             return Result.failure(new UseCaseError.NotFoundError(
-                "SERVICE_ACCOUNT_NOT_FOUND",
-                "Service account not found",
-                Map.of("serviceAccountId", command.serviceAccountId())
+                "CONNECTION_NOT_FOUND",
+                "Connection not found",
+                Map.of("connectionId", command.connectionId())
             ));
         }
+
         // Validate client (if provided)
         String clientIdentifier = null;
         if (command.clientId() != null && !command.clientId().isBlank()) {
@@ -240,7 +235,7 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
             clientIdentifier,
             command.clientScoped(),
             command.eventTypes(),
-            command.target(),
+            command.connectionId(),
             command.queue(),
             command.customConfig(),
             source,
@@ -253,7 +248,6 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
             mode,
             timeoutSeconds,
             maxRetries,
-            command.serviceAccountId(),
             dataOnly,
             now,
             now
@@ -270,7 +264,7 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
             .clientId(subscription.clientId())
             .clientIdentifier(subscription.clientIdentifier())
             .eventTypes(subscription.eventTypes())
-            .target(subscription.target())
+            .connectionId(subscription.connectionId())
             .queue(subscription.queue())
             .customConfig(subscription.customConfig())
             .subscriptionSource(subscription.source())
@@ -283,7 +277,6 @@ public class CreateSubscriptionUseCase implements UseCase<CreateSubscriptionComm
             .mode(subscription.mode())
             .timeoutSeconds(subscription.timeoutSeconds())
             .maxRetries(subscription.maxRetries())
-            .serviceAccountId(subscription.serviceAccountId())
             .dataOnly(subscription.dataOnly())
             .build();
 

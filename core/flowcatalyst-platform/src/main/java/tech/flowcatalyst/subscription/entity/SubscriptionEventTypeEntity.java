@@ -6,7 +6,7 @@ import jakarta.persistence.*;
  * JPA Entity for subscription event type bindings (normalized from embedded array).
  */
 @Entity
-@Table(name = "subscription_event_types")
+@Table(name = "msg_subscription_event_types")
 public class SubscriptionEventTypeEntity {
 
     @Id

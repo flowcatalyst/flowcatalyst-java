@@ -51,7 +51,7 @@ public class DeleteEventTypeUseCase implements UseCase<DeleteEventTypeCommand, E
         }
 
         // Can delete if archived
-        boolean canDelete = eventType.status() == EventTypeStatus.ARCHIVE;
+        boolean canDelete = eventType.status() == EventTypeStatus.ARCHIVED;
 
         // Can delete if CURRENT with all schemas in FINALISING (never finalized)
         if (!canDelete && eventType.status() == EventTypeStatus.CURRENT && eventType.allVersionsFinalising()) {

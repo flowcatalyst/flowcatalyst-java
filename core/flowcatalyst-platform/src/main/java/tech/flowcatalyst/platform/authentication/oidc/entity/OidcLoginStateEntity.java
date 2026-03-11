@@ -11,7 +11,7 @@ import java.time.Instant;
  * JPA entity for oidc_login_states table.
  */
 @Entity
-@Table(name = "oidc_login_states")
+@Table(name = "oauth_oidc_login_states")
 public class OidcLoginStateEntity {
 
     @Id

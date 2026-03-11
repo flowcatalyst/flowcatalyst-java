@@ -111,7 +111,7 @@ public class DispatchJobReadRepository implements DispatchJobRepository {
     public List<DispatchJob> findByMetadata(String key, String value) {
         @SuppressWarnings("unchecked")
         List<DispatchJobJpaEntity> results = em.createNativeQuery(
-                "SELECT DISTINCT dj.* FROM dispatch_jobs dj " +
+                "SELECT DISTINCT dj.* FROM msg_dispatch_jobs dj " +
                 "JOIN dispatch_job_metadata djm ON dj.id = djm.dispatch_job_id " +
                 "WHERE djm.metadata_key = :key AND djm.metadata_value = :value",
                 DispatchJobJpaEntity.class)
@@ -129,7 +129,7 @@ public class DispatchJobReadRepository implements DispatchJobRepository {
 
         // Build a query that finds jobs matching ALL metadata key-value pairs
         StringBuilder sql = new StringBuilder(
-            "SELECT DISTINCT dj.* FROM dispatch_jobs dj ");
+            "SELECT DISTINCT dj.* FROM msg_dispatch_jobs dj ");
 
         int i = 0;
         for (String key : metadataFilters.keySet()) {

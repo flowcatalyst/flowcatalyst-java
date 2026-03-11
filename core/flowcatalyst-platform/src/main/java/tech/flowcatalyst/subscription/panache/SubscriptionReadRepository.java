@@ -91,8 +91,8 @@ public class SubscriptionReadRepository implements SubscriptionRepository {
     public List<Subscription> findByEventTypeId(String eventTypeId) {
         @SuppressWarnings("unchecked")
         List<SubscriptionEntity> results = em.createNativeQuery(
-                "SELECT s.* FROM subscriptions s " +
-                "JOIN subscription_event_types e ON s.id = e.subscription_id " +
+                "SELECT s.* FROM msg_subscriptions s " +
+                "JOIN msg_subscription_event_types e ON s.id = e.subscription_id " +
                 "WHERE e.event_type_id = :eventTypeId",
                 SubscriptionEntity.class)
             .setParameter("eventTypeId", eventTypeId)
@@ -157,8 +157,8 @@ public class SubscriptionReadRepository implements SubscriptionRepository {
     public List<Subscription> findActiveByEventTypeAndClient(String eventTypeId, String clientId) {
         @SuppressWarnings("unchecked")
         List<SubscriptionEntity> results = em.createNativeQuery(
-                "SELECT s.* FROM subscriptions s " +
-                "JOIN subscription_event_types e ON s.id = e.subscription_id " +
+                "SELECT s.* FROM msg_subscriptions s " +
+                "JOIN msg_subscription_event_types e ON s.id = e.subscription_id " +
                 "WHERE e.event_type_id = :eventTypeId AND s.status = 'ACTIVE' " +
                 "AND (s.client_id = :clientId OR s.client_id IS NULL)",
                 SubscriptionEntity.class)
@@ -172,8 +172,8 @@ public class SubscriptionReadRepository implements SubscriptionRepository {
     public List<Subscription> findActiveByEventTypeCodeAndClient(String eventTypeCode, String clientId) {
         @SuppressWarnings("unchecked")
         List<SubscriptionEntity> results = em.createNativeQuery(
-                "SELECT s.* FROM subscriptions s " +
-                "JOIN subscription_event_types e ON s.id = e.subscription_id " +
+                "SELECT s.* FROM msg_subscriptions s " +
+                "JOIN msg_subscription_event_types e ON s.id = e.subscription_id " +
                 "WHERE e.event_type_code = :eventTypeCode AND s.status = 'ACTIVE' " +
                 "AND (s.client_id = :clientId OR s.client_id IS NULL)",
                 SubscriptionEntity.class)

@@ -6,8 +6,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import tech.flowcatalyst.eventtype.EventTypeSource;
 import tech.flowcatalyst.eventtype.EventTypeStatus;
 
@@ -17,25 +15,21 @@ import java.time.Instant;
  * JPA entity for event_types table.
  */
 @Entity
-@Table(name = "event_types")
+@Table(name = "msg_event_types")
 public class EventTypeEntity {
 
     @Id
     @Column(name = "id", length = 17)
     public String id;
 
-    @Column(name = "code", nullable = false, unique = true)
+    @Column(name = "code", nullable = false, unique = true, length = 255)
     public String code;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 255)
     public String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     public String description;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "spec_versions", columnDefinition = "jsonb")
-    public String specVersionsJson;
 
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)

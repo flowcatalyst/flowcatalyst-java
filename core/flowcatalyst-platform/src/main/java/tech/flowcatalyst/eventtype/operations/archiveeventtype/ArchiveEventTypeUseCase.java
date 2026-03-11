@@ -47,7 +47,7 @@ public class ArchiveEventTypeUseCase implements UseCase<ArchiveEventTypeCommand,
         }
 
         // Business rule: already archived
-        if (eventType.status() == EventTypeStatus.ARCHIVE) {
+        if (eventType.status() == EventTypeStatus.ARCHIVED) {
             return Result.failure(new UseCaseError.BusinessRuleViolation(
                 "ALREADY_ARCHIVED",
                 "Event type is already archived",
@@ -65,7 +65,7 @@ public class ArchiveEventTypeUseCase implements UseCase<ArchiveEventTypeCommand,
         }
 
         // Archive the event type immutably
-        EventType updated = eventType.withStatus(EventTypeStatus.ARCHIVE);
+        EventType updated = eventType.withStatus(EventTypeStatus.ARCHIVED);
 
         // Create domain event
         EventTypeArchived event = EventTypeArchived.fromContext(context)

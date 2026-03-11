@@ -17,7 +17,7 @@ import java.util.Objects;
  * Users get no applications by default - each must be explicitly granted.
  */
 @Entity
-@Table(name = "principal_application_access")
+@Table(name = "iam_principal_application_access")
 @IdClass(PrincipalApplicationAccessEntity.PrincipalApplicationAccessId.class)
 public class PrincipalApplicationAccessEntity {
 

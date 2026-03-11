@@ -33,6 +33,7 @@ public final class DispatchJobReadMapper {
         job.eventId = entity.eventId;
         job.correlationId = entity.correlationId;
         job.targetUrl = entity.targetUrl;
+        job.connectionId = entity.connectionId;
         job.protocol = entity.protocol;
         job.clientId = entity.clientId;
         job.subscriptionId = entity.subscriptionId;
@@ -84,6 +85,7 @@ public final class DispatchJobReadMapper {
         entity.eventId = domain.eventId;
         entity.correlationId = domain.correlationId;
         entity.targetUrl = domain.targetUrl;
+        entity.connectionId = domain.connectionId;
         entity.protocol = domain.protocol;
         entity.clientId = domain.clientId;
         entity.subscriptionId = domain.subscriptionId;
@@ -129,6 +131,7 @@ public final class DispatchJobReadMapper {
         entity.eventId = domain.eventId;
         entity.correlationId = domain.correlationId;
         entity.targetUrl = domain.targetUrl;
+        entity.connectionId = domain.connectionId;
         entity.protocol = domain.protocol;
         entity.clientId = domain.clientId;
         entity.subscriptionId = domain.subscriptionId;

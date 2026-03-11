@@ -13,7 +13,7 @@ import java.time.Instant;
  * JPA entity for applications table.
  */
 @Entity
-@Table(name = "applications")
+@Table(name = "app_applications")
 public class ApplicationEntity {
 
     @Id

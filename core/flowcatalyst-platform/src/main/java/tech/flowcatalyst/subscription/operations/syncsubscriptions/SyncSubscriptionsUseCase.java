@@ -30,7 +30,7 @@ import java.util.*;
  *
  * <p>Note: A registered Application entity is NOT required. Subscriptions can be
  * synced for modules/prefixes that are not registered applications. In this case,
- * the serviceAccountId will be null (unauthenticated webhooks).
+ * the connectionId will need to be provided explicitly.
  */
 @ApplicationScoped
 public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsCommand, SubscriptionsSynced> {
@@ -72,7 +72,6 @@ public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsComman
 
         // Look up application (optional - subscriptions can exist for modules without registered apps)
         Application app = appRepo.findByCode(command.applicationCode()).orElse(null);
-        String serviceAccountId = app != null ? app.serviceAccountId : null;
 
         Set<String> syncedCodes = new HashSet<>();
         int created = 0;
@@ -137,7 +136,7 @@ public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsComman
                         .name(item.name() != null ? item.name() : existing.name())
                         .description(item.description())
                         .eventTypes(eventTypeBindings.isEmpty() ? existing.eventTypes() : eventTypeBindings)
-                        .target(item.target() != null ? item.target() : existing.target())
+                        .connectionId(item.connectionId() != null ? item.connectionId() : existing.connectionId())
                         .queue(item.queue() != null ? item.queue() : existing.queue())
                         .customConfig(item.customConfig() != null ? item.customConfig() : existing.customConfig())
                         .maxAgeSeconds(item.maxAgeSeconds() != null ? item.maxAgeSeconds() : existing.maxAgeSeconds())
@@ -157,10 +156,10 @@ public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsComman
                 // Don't update UI-sourced subscriptions from SDK sync
             } else {
                 // Validate required fields for creation
-                if (item.target() == null || item.target().isBlank()) {
+                if (item.connectionId() == null || item.connectionId().isBlank()) {
                     return Result.failure(new UseCaseError.ValidationError(
-                        "TARGET_REQUIRED",
-                        "Target URL is required for new subscription: " + code,
+                        "CONNECTION_REQUIRED",
+                        "Connection ID is required for new subscription: " + code,
                         Map.of("subscriptionCode", code)
                     ));
                 }
@@ -192,7 +191,7 @@ public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsComman
                     null, // no client identifier
                     clientScoped,
                     eventTypeBindings,
-                    item.target(),
+                    item.connectionId(),
                     item.queue(),
                     item.customConfig(),
                     SubscriptionSource.API,
@@ -205,7 +204,6 @@ public class SyncSubscriptionsUseCase implements UseCase<SyncSubscriptionsComman
                     item.mode() != null ? item.mode() : DispatchMode.IMMEDIATE,
                     item.timeoutSeconds() != null ? item.timeoutSeconds() : Subscription.DEFAULT_TIMEOUT_SECONDS,
                     item.maxRetries() != null ? item.maxRetries() : Subscription.DEFAULT_MAX_RETRIES,
-                    serviceAccountId,
                     item.dataOnly() != null ? item.dataOnly() : Subscription.DEFAULT_DATA_ONLY,
                     now,
                     now

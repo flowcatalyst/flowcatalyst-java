@@ -15,7 +15,7 @@ import java.time.Instant;
  * JPA entity for platform_configs table.
  */
 @Entity
-@Table(name = "platform_configs")
+@Table(name = "app_platform_configs")
 public class PlatformConfigEntity {
 
     @Id

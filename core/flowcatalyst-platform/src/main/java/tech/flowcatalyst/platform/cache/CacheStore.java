@@ -16,7 +16,7 @@ import java.util.Optional;
  * <p>Configure via:
  * <pre>
  * flowcatalyst.cache.type=MEMORY|DATABASE|REDIS
- * flowcatalyst.cache.ttl=5m
+ * flowcatalyst.cache.ttl=PT5M
  * </pre>
  */
 public interface CacheStore {

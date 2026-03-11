@@ -21,7 +21,7 @@ import java.util.List;
  * JPA entity for email_domain_mappings table.
  */
 @Entity
-@Table(name = "email_domain_mappings", indexes = {
+@Table(name = "tnt_email_domain_mappings", indexes = {
     @Index(name = "idx_edm_idp", columnList = "identity_provider_id")
 })
 public class EmailDomainMappingEntity {
@@ -45,7 +45,7 @@ public class EmailDomainMappingEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "email_domain_mapping_additional_clients",
+        name = "tnt_email_domain_mapping_additional_clients",
         joinColumns = @JoinColumn(name = "email_domain_mapping_id")
     )
     @Column(name = "client_id", length = 17)
@@ -53,7 +53,7 @@ public class EmailDomainMappingEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "email_domain_mapping_granted_clients",
+        name = "tnt_email_domain_mapping_granted_clients",
         joinColumns = @JoinColumn(name = "email_domain_mapping_id")
     )
     @Column(name = "client_id", length = 17)
@@ -64,7 +64,7 @@ public class EmailDomainMappingEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "email_domain_mapping_allowed_roles",
+        name = "tnt_email_domain_mapping_allowed_roles",
         joinColumns = @JoinColumn(name = "email_domain_mapping_id")
     )
     @Column(name = "role_id", length = 17)

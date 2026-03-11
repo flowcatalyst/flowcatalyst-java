@@ -16,7 +16,7 @@ import java.util.Objects;
  * It replaces the JSONB roles column in principals table.
  */
 @Entity
-@Table(name = "principal_roles")
+@Table(name = "iam_principal_roles")
 @IdClass(PrincipalRoleEntity.PrincipalRoleId.class)
 public class PrincipalRoleEntity {
 

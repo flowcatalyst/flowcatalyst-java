@@ -41,7 +41,7 @@ public record SubscriptionCreated(
     String clientId,
     String clientIdentifier,
     List<EventTypeBinding> eventTypes,
-    String target,
+    String connectionId,
     String queue,
     List<ConfigEntry> customConfig,
     SubscriptionSource subscriptionSource,
@@ -54,7 +54,6 @@ public record SubscriptionCreated(
     DispatchMode mode,
     int timeoutSeconds,
     int maxRetries,
-    String serviceAccountId,
     boolean dataOnly
 ) implements SubscriptionEvent {
 
@@ -104,10 +103,10 @@ public record SubscriptionCreated(
         try {
             return MAPPER.writeValueAsString(new Data(
                 subscriptionId, code, applicationCode, name, description, clientScoped, clientId, clientIdentifier,
-                eventTypes, target, queue, customConfig, subscriptionSource, status,
+                eventTypes, connectionId, queue, customConfig, subscriptionSource, status,
                 maxAgeSeconds, dispatchPoolId, dispatchPoolCode,
                 delaySeconds, sequence, mode, timeoutSeconds, maxRetries,
-                serviceAccountId, dataOnly
+                dataOnly
             ));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize event data", e);
@@ -124,7 +123,7 @@ public record SubscriptionCreated(
         String clientId,
         String clientIdentifier,
         List<EventTypeBinding> eventTypes,
-        String target,
+        String connectionId,
         String queue,
         List<ConfigEntry> customConfig,
         SubscriptionSource subscriptionSource,
@@ -137,8 +136,7 @@ public record SubscriptionCreated(
         DispatchMode mode,
         int timeoutSeconds,
         int maxRetries,
-        String serviceAccountId,
-        boolean dataOnly
+            boolean dataOnly
     ) {}
 
     /**

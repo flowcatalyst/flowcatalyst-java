@@ -160,6 +160,9 @@ public class DispatchJob {
     // Target Information
     public String targetUrl;
 
+    /** Connection ID linking to msg_connections */
+    public String connectionId;
+
     public DispatchProtocol protocol = DispatchProtocol.HTTP_WEBHOOK;
 
     // ========================================================================

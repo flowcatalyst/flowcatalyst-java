@@ -13,7 +13,7 @@ import java.time.Instant;
  * JPA entity for application_client_configs table.
  */
 @Entity
-@Table(name = "application_client_configs",
+@Table(name = "app_client_configs",
     uniqueConstraints = @UniqueConstraint(columnNames = {"application_id", "client_id"}))
 public class ApplicationClientConfigEntity {
 

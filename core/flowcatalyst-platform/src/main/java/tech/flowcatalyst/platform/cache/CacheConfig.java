@@ -20,7 +20,7 @@ public interface CacheConfig {
     /**
      * Default time-to-live for cache entries.
      */
-    @WithDefault("5m")
+    @WithDefault("PT5M")
     Duration ttl();
 
     /**

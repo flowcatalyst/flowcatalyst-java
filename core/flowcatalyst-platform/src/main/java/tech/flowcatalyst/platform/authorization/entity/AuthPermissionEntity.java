@@ -13,7 +13,7 @@ import java.time.Instant;
  * JPA entity for auth_permissions table.
  */
 @Entity
-@Table(name = "auth_permissions")
+@Table(name = "iam_permissions")
 public class AuthPermissionEntity {
 
     @Id

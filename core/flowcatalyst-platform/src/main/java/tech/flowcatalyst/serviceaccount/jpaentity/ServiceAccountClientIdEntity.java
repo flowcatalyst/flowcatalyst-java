@@ -6,7 +6,7 @@ import jakarta.persistence.*;
  * JPA Entity for service_account_client_ids table (normalized from clientIds array).
  */
 @Entity
-@Table(name = "service_account_client_ids")
+@Table(name = "iam_service_account_client_ids")
 public class ServiceAccountClientIdEntity {
 
     @Id

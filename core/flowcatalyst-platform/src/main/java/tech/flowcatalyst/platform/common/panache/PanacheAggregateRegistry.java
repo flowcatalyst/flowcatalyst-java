@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import tech.flowcatalyst.dispatchpool.DispatchPool;
 import tech.flowcatalyst.eventtype.EventType;
+import tech.flowcatalyst.eventtype.SpecVersion;
 import tech.flowcatalyst.platform.application.Application;
 import tech.flowcatalyst.platform.application.ApplicationClientConfig;
 import tech.flowcatalyst.platform.authentication.domain.EmailDomainMapping;
@@ -16,7 +17,8 @@ import tech.flowcatalyst.platform.authorization.AuthRole;
 import tech.flowcatalyst.platform.client.Client;
 import tech.flowcatalyst.platform.client.ClientAccessGrant;
 import tech.flowcatalyst.platform.principal.Principal;
-import tech.flowcatalyst.schema.Schema;
+import tech.flowcatalyst.platform.shared.EntityType;
+import tech.flowcatalyst.platform.shared.TsidGenerator;
 import tech.flowcatalyst.serviceaccount.entity.ServiceAccount;
 import tech.flowcatalyst.subscription.Subscription;
 
@@ -65,8 +67,6 @@ public class PanacheAggregateRegistry {
             persistEventType((EventType) aggregate);
         } else if (clazz == Subscription.class) {
             persistSubscription((Subscription) aggregate);
-        } else if (clazz == Schema.class) {
-            persistSchema((Schema) aggregate);
         } else if (clazz == Client.class) {
             persistClient((Client) aggregate);
         } else if (clazz == Principal.class) {
@@ -112,14 +112,14 @@ public class PanacheAggregateRegistry {
 
         // Handle junction tables for AuthRole
         if (clazz == AuthRole.class) {
-            em.createNativeQuery("DELETE FROM role_permissions WHERE role_id = :id")
+            em.createNativeQuery("DELETE FROM iam_role_permissions WHERE role_id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
         }
 
         // Handle junction tables for ServiceAccount
         if (clazz == ServiceAccount.class) {
-            em.createNativeQuery("DELETE FROM service_account_client_ids WHERE service_account_id = :id")
+            em.createNativeQuery("DELETE FROM iam_service_account_client_ids WHERE service_account_id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
             // Note: Roles are stored on Principal, not ServiceAccount (service_account_roles table is deprecated)
@@ -127,10 +127,10 @@ public class PanacheAggregateRegistry {
 
         // Handle junction tables for Principal
         if (clazz == Principal.class) {
-            em.createNativeQuery("DELETE FROM principal_roles WHERE principal_id = :id")
+            em.createNativeQuery("DELETE FROM iam_principal_roles WHERE principal_id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
-            em.createNativeQuery("DELETE FROM principal_application_access WHERE principal_id = :id")
+            em.createNativeQuery("DELETE FROM iam_principal_application_access WHERE principal_id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
         }
@@ -171,7 +171,7 @@ public class PanacheAggregateRegistry {
 
     private void persistApplication(Application app) {
         String sql = """
-            INSERT INTO applications (id, code, name, description, type, default_base_url,
+            INSERT INTO app_applications (id, code, name, description, type, default_base_url,
                 service_account_id, active, icon_url, website, logo, logo_mime_type, created_at, updated_at)
             VALUES (:id, :code, :name, :description, :type, :defaultBaseUrl,
                 :serviceAccountId, :active, :iconUrl, :website, :logo, :logoMimeType, :createdAt, :updatedAt)
@@ -202,7 +202,7 @@ public class PanacheAggregateRegistry {
 
     private void persistApplicationClientConfig(ApplicationClientConfig config) {
         String sql = """
-            INSERT INTO application_client_configs (id, application_id, client_id, enabled,
+            INSERT INTO app_client_configs (id, application_id, client_id, enabled,
                 base_url_override, website_override, config_json, created_at, updated_at)
             VALUES (:id, :applicationId, :clientId, :enabled, :baseUrlOverride,
                 :websiteOverride, CAST(:configJson AS jsonb), :createdAt, :updatedAt)
@@ -227,54 +227,93 @@ public class PanacheAggregateRegistry {
 
     private void persistEventType(EventType eventType) {
         String sql = """
-            INSERT INTO event_types (id, code, name, description, spec_versions, status, created_at, updated_at)
-            VALUES (:id, :code, :name, :description, CAST(:specVersions AS jsonb), :status, :createdAt, :updatedAt)
+            INSERT INTO msg_event_types (id, code, name, description, status, source, client_scoped,
+                application, subdomain, aggregate, created_at, updated_at)
+            VALUES (:id, :code, :name, :description, :status, :source, :clientScoped,
+                :application, :subdomain, :aggregate, :createdAt, :updatedAt)
             ON CONFLICT (id) DO UPDATE SET
                 code = EXCLUDED.code, name = EXCLUDED.name, description = EXCLUDED.description,
-                spec_versions = EXCLUDED.spec_versions, status = EXCLUDED.status, updated_at = EXCLUDED.updated_at
+                status = EXCLUDED.status, source = EXCLUDED.source, client_scoped = EXCLUDED.client_scoped,
+                application = EXCLUDED.application, subdomain = EXCLUDED.subdomain, aggregate = EXCLUDED.aggregate,
+                updated_at = EXCLUDED.updated_at
             """;
         em.createNativeQuery(sql)
             .setParameter("id", eventType.id())
             .setParameter("code", eventType.code())
             .setParameter("name", eventType.name())
             .setParameter("description", eventType.description())
-            .setParameter("specVersions", toJson(eventType.specVersions()))
             .setParameter("status", eventType.status() != null ? eventType.status().name() : "CURRENT")
+            .setParameter("source", eventType.source() != null ? eventType.source().name() : "UI")
+            .setParameter("clientScoped", eventType.clientScoped())
+            .setParameter("application", eventType.application())
+            .setParameter("subdomain", eventType.subdomain())
+            .setParameter("aggregate", eventType.aggregate())
             .setParameter("createdAt", eventType.createdAt())
             .setParameter("updatedAt", eventType.updatedAt())
             .executeUpdate();
+
+        // Persist spec versions to msg_event_type_spec_versions
+        if (eventType.specVersions() != null) {
+            for (SpecVersion sv : eventType.specVersions()) {
+                String svSql = """
+                    INSERT INTO msg_event_type_spec_versions (id, event_type_id, version, mime_type,
+                        schema_content, schema_type, status, created_at, updated_at)
+                    VALUES (:id, :eventTypeId, :version, :mimeType,
+                        CAST(:schemaContent AS jsonb), :schemaType, :status, :createdAt, :updatedAt)
+                    ON CONFLICT (event_type_id, version) DO UPDATE SET
+                        mime_type = EXCLUDED.mime_type, schema_content = EXCLUDED.schema_content,
+                        schema_type = EXCLUDED.schema_type, status = EXCLUDED.status,
+                        updated_at = EXCLUDED.updated_at
+                    """;
+                em.createNativeQuery(svSql)
+                    .setParameter("id", TsidGenerator.generate(EntityType.SCHEMA))
+                    .setParameter("eventTypeId", eventType.id())
+                    .setParameter("version", sv.version())
+                    .setParameter("mimeType", sv.mimeType())
+                    .setParameter("schemaContent", sv.schema())
+                    .setParameter("schemaType", sv.schemaType() != null ? sv.schemaType().name() : null)
+                    .setParameter("status", sv.status() != null ? sv.status().name() : "FINALISING")
+                    .setParameter("createdAt", eventType.updatedAt())
+                    .setParameter("updatedAt", eventType.updatedAt())
+                    .executeUpdate();
+            }
+        }
     }
 
     private void persistSubscription(Subscription sub) {
         String sql = """
-            INSERT INTO subscriptions (id, code, name, description, client_id, client_identifier,
-                event_types, target, queue, custom_config, source, status, max_age_seconds,
+            INSERT INTO msg_subscriptions (id, code, application_code, name, description, client_id, client_identifier,
+                client_scoped, event_types, connection_id, queue, custom_config, source, status, max_age_seconds,
                 dispatch_pool_id, dispatch_pool_code, delay_seconds, sequence, mode,
-                timeout_seconds, max_retries, service_account_id, data_only, created_at, updated_at)
-            VALUES (:id, :code, :name, :description, :clientId, :clientIdentifier,
-                CAST(:eventTypes AS jsonb), :target, :queue, CAST(:customConfig AS jsonb), :source, :status, :maxAgeSeconds,
+                timeout_seconds, max_retries, data_only, created_at, updated_at)
+            VALUES (:id, :code, :applicationCode, :name, :description, :clientId, :clientIdentifier,
+                :clientScoped, CAST(:eventTypes AS jsonb), :connectionId, :queue, CAST(:customConfig AS jsonb), :source, :status, :maxAgeSeconds,
                 :dispatchPoolId, :dispatchPoolCode, :delaySeconds, :sequence, :mode,
-                :timeoutSeconds, :maxRetries, :serviceAccountId, :dataOnly, :createdAt, :updatedAt)
+                :timeoutSeconds, :maxRetries, :dataOnly, :createdAt, :updatedAt)
             ON CONFLICT (id) DO UPDATE SET
-                code = EXCLUDED.code, name = EXCLUDED.name, description = EXCLUDED.description,
+                code = EXCLUDED.code, application_code = EXCLUDED.application_code,
+                name = EXCLUDED.name, description = EXCLUDED.description,
                 client_id = EXCLUDED.client_id, client_identifier = EXCLUDED.client_identifier,
-                event_types = EXCLUDED.event_types, target = EXCLUDED.target, queue = EXCLUDED.queue,
+                client_scoped = EXCLUDED.client_scoped,
+                event_types = EXCLUDED.event_types, connection_id = EXCLUDED.connection_id, queue = EXCLUDED.queue,
                 custom_config = EXCLUDED.custom_config, source = EXCLUDED.source, status = EXCLUDED.status,
                 max_age_seconds = EXCLUDED.max_age_seconds, dispatch_pool_id = EXCLUDED.dispatch_pool_id,
                 dispatch_pool_code = EXCLUDED.dispatch_pool_code, delay_seconds = EXCLUDED.delay_seconds,
                 sequence = EXCLUDED.sequence, mode = EXCLUDED.mode, timeout_seconds = EXCLUDED.timeout_seconds,
-                max_retries = EXCLUDED.max_retries, service_account_id = EXCLUDED.service_account_id,
+                max_retries = EXCLUDED.max_retries,
                 data_only = EXCLUDED.data_only, updated_at = EXCLUDED.updated_at
             """;
         em.createNativeQuery(sql)
             .setParameter("id", sub.id())
             .setParameter("code", sub.code())
+            .setParameter("applicationCode", sub.applicationCode())
             .setParameter("name", sub.name())
             .setParameter("description", sub.description())
             .setParameter("clientId", sub.clientId())
             .setParameter("clientIdentifier", sub.clientIdentifier())
+            .setParameter("clientScoped", sub.clientScoped())
             .setParameter("eventTypes", toJson(sub.eventTypes()))
-            .setParameter("target", sub.target())
+            .setParameter("connectionId", sub.connectionId())
             .setParameter("queue", sub.queue())
             .setParameter("customConfig", toJson(sub.customConfig()))
             .setParameter("source", sub.source() != null ? sub.source().name() : "API")
@@ -287,41 +326,15 @@ public class PanacheAggregateRegistry {
             .setParameter("mode", sub.mode() != null ? sub.mode().name() : "IMMEDIATE")
             .setParameter("timeoutSeconds", sub.timeoutSeconds())
             .setParameter("maxRetries", sub.maxRetries())
-            .setParameter("serviceAccountId", sub.serviceAccountId())
             .setParameter("dataOnly", sub.dataOnly())
             .setParameter("createdAt", sub.createdAt())
             .setParameter("updatedAt", sub.updatedAt())
             .executeUpdate();
     }
 
-    private void persistSchema(Schema schema) {
-        String sql = """
-            INSERT INTO schemas (id, name, description, mime_type, schema_type, content,
-                event_type_id, version, created_at, updated_at)
-            VALUES (:id, :name, :description, :mimeType, :schemaType, :content,
-                :eventTypeId, :version, :createdAt, :updatedAt)
-            ON CONFLICT (id) DO UPDATE SET
-                name = EXCLUDED.name, description = EXCLUDED.description, mime_type = EXCLUDED.mime_type,
-                schema_type = EXCLUDED.schema_type, content = EXCLUDED.content,
-                event_type_id = EXCLUDED.event_type_id, version = EXCLUDED.version, updated_at = EXCLUDED.updated_at
-            """;
-        em.createNativeQuery(sql)
-            .setParameter("id", schema.id())
-            .setParameter("name", schema.name())
-            .setParameter("description", schema.description())
-            .setParameter("mimeType", schema.mimeType())
-            .setParameter("schemaType", schema.schemaType() != null ? schema.schemaType().name() : null)
-            .setParameter("content", schema.content())
-            .setParameter("eventTypeId", schema.eventTypeId())
-            .setParameter("version", schema.version())
-            .setParameter("createdAt", schema.createdAt())
-            .setParameter("updatedAt", schema.updatedAt())
-            .executeUpdate();
-    }
-
     private void persistClient(Client client) {
         String sql = """
-            INSERT INTO clients (id, name, identifier, status, status_reason, status_changed_at,
+            INSERT INTO tnt_clients (id, name, identifier, status, status_reason, status_changed_at,
                 notes, created_at, updated_at)
             VALUES (:id, :name, :identifier, :status, :statusReason, :statusChangedAt,
                 CAST(:notes AS jsonb), :createdAt, :updatedAt)
@@ -349,7 +362,7 @@ public class PanacheAggregateRegistry {
         // Note: service_account_id added in V22 - links to ServiceAccount entity for SERVICE type
         // Note: application_id and service_account columns are deprecated (set to NULL)
         String sql = """
-            INSERT INTO principals (id, type, scope, client_id, application_id, name, active,
+            INSERT INTO iam_principals (id, type, scope, client_id, application_id, name, active,
                 email, email_domain, idp_type, external_idp_id, password_hash, last_login_at,
                 service_account_id, service_account, created_at, updated_at)
             VALUES (:id, :type, :scope, :clientId, NULL, :name, :active,
@@ -387,7 +400,7 @@ public class PanacheAggregateRegistry {
 
     private void savePrincipalRoles(Principal principal) {
         // Delete existing roles
-        em.createNativeQuery("DELETE FROM principal_roles WHERE principal_id = :id")
+        em.createNativeQuery("DELETE FROM iam_principal_roles WHERE principal_id = :id")
             .setParameter("id", principal.id)
             .executeUpdate();
 
@@ -395,7 +408,7 @@ public class PanacheAggregateRegistry {
         if (principal.roles != null) {
             for (var role : principal.roles) {
                 em.createNativeQuery("""
-                    INSERT INTO principal_roles (principal_id, role_name, assignment_source, assigned_at)
+                    INSERT INTO iam_principal_roles (principal_id, role_name, assignment_source, assigned_at)
                     VALUES (:principalId, :roleName, :assignmentSource, :assignedAt)
                     """)
                     .setParameter("principalId", principal.id)
@@ -487,7 +500,7 @@ public class PanacheAggregateRegistry {
         var wc = sa.webhookCredentials;
         // Note: client_ids and roles columns were normalized to junction tables in V12 migration
         String sql = """
-            INSERT INTO service_accounts (id, code, name, description, application_id,
+            INSERT INTO iam_service_accounts (id, code, name, description, application_id,
                 active, wh_auth_type, wh_auth_token_ref, wh_signing_secret_ref, wh_signing_algorithm,
                 wh_credentials_created_at, wh_credentials_regenerated_at, last_used_at, created_at, updated_at)
             VALUES (:id, :code, :name, :description, :applicationId,
@@ -527,7 +540,7 @@ public class PanacheAggregateRegistry {
 
     private void saveServiceAccountClientIds(ServiceAccount sa) {
         // Delete existing client ID associations
-        em.createNativeQuery("DELETE FROM service_account_client_ids WHERE service_account_id = :id")
+        em.createNativeQuery("DELETE FROM iam_service_account_client_ids WHERE service_account_id = :id")
             .setParameter("id", sa.id)
             .executeUpdate();
 
@@ -535,7 +548,7 @@ public class PanacheAggregateRegistry {
         if (sa.clientIds != null) {
             for (String clientId : sa.clientIds) {
                 em.createNativeQuery("""
-                    INSERT INTO service_account_client_ids (service_account_id, client_id)
+                    INSERT INTO iam_service_account_client_ids (service_account_id, client_id)
                     VALUES (:serviceAccountId, :clientId)
                     """)
                     .setParameter("serviceAccountId", sa.id)
@@ -547,7 +560,7 @@ public class PanacheAggregateRegistry {
 
     private void persistAuthRole(AuthRole role) {
         String sql = """
-            INSERT INTO auth_roles (id, application_id, application_code, name, display_name,
+            INSERT INTO iam_roles (id, application_id, application_code, name, display_name,
                 description, source, client_managed, created_at, updated_at)
             VALUES (:id, :applicationId, :applicationCode, :name, :displayName,
                 :description, :source, :clientManaged, :createdAt, :updatedAt)
@@ -571,11 +584,11 @@ public class PanacheAggregateRegistry {
             .executeUpdate();
 
         // Save permissions to normalized role_permissions table
-        em.createNativeQuery("DELETE FROM role_permissions WHERE role_id = :roleId")
+        em.createNativeQuery("DELETE FROM iam_role_permissions WHERE role_id = :roleId")
             .setParameter("roleId", role.id).executeUpdate();
         if (role.permissions != null) {
             for (String perm : role.permissions) {
-                em.createNativeQuery("INSERT INTO role_permissions (role_id, permission) VALUES (:roleId, :perm)")
+                em.createNativeQuery("INSERT INTO iam_role_permissions (role_id, permission) VALUES (:roleId, :perm)")
                     .setParameter("roleId", role.id).setParameter("perm", perm).executeUpdate();
             }
         }
@@ -583,7 +596,7 @@ public class PanacheAggregateRegistry {
 
     private void persistAuthPermission(AuthPermission perm) {
         String sql = """
-            INSERT INTO auth_permissions (id, application_id, name, display_name, description, source, created_at)
+            INSERT INTO iam_permissions (id, application_id, name, display_name, description, source, created_at)
             VALUES (:id, :applicationId, :name, :displayName, :description, :source, :createdAt)
             ON CONFLICT (id) DO UPDATE SET
                 application_id = EXCLUDED.application_id, name = EXCLUDED.name,
@@ -602,7 +615,7 @@ public class PanacheAggregateRegistry {
 
     private void persistDispatchPool(DispatchPool pool) {
         String sql = """
-            INSERT INTO dispatch_pools (id, code, name, description, rate_limit, concurrency,
+            INSERT INTO msg_dispatch_pools (id, code, name, description, rate_limit, concurrency,
                 client_id, client_identifier, status, created_at, updated_at)
             VALUES (:id, :code, :name, :description, :rateLimit, :concurrency,
                 :clientId, :clientIdentifier, :status, :createdAt, :updatedAt)
@@ -629,7 +642,7 @@ public class PanacheAggregateRegistry {
 
     private void persistClientAccessGrant(ClientAccessGrant grant) {
         String sql = """
-            INSERT INTO client_access_grants (id, principal_id, client_id, granted_at, expires_at)
+            INSERT INTO iam_client_access_grants (id, principal_id, client_id, granted_at, expires_at)
             VALUES (:id, :principalId, :clientId, :grantedAt, :expiresAt)
             ON CONFLICT (id) DO UPDATE SET
                 principal_id = EXCLUDED.principal_id, client_id = EXCLUDED.client_id,
@@ -647,7 +660,7 @@ public class PanacheAggregateRegistry {
     private void persistIdentityProvider(IdentityProvider idp) {
         // Insert/update main identity_providers table
         String sql = """
-            INSERT INTO identity_providers (id, code, name, type, oidc_issuer_url, oidc_client_id,
+            INSERT INTO oauth_identity_providers (id, code, name, type, oidc_issuer_url, oidc_client_id,
                 oidc_client_secret_ref, oidc_multi_tenant, oidc_issuer_pattern, created_at, updated_at)
             VALUES (:id, :code, :name, :type, :oidcIssuerUrl, :oidcClientId,
                 :oidcClientSecretRef, :oidcMultiTenant, :oidcIssuerPattern, :createdAt, :updatedAt)
@@ -672,14 +685,14 @@ public class PanacheAggregateRegistry {
             .executeUpdate();
 
         // Handle allowed_email_domains junction table
-        em.createNativeQuery("DELETE FROM identity_provider_allowed_domains WHERE identity_provider_id = :idpId")
+        em.createNativeQuery("DELETE FROM oauth_identity_provider_allowed_domains WHERE identity_provider_id = :idpId")
             .setParameter("idpId", idp.id)
             .executeUpdate();
 
         if (idp.allowedEmailDomains != null && !idp.allowedEmailDomains.isEmpty()) {
             for (String domain : idp.allowedEmailDomains) {
                 em.createNativeQuery("""
-                    INSERT INTO identity_provider_allowed_domains (identity_provider_id, email_domain)
+                    INSERT INTO oauth_identity_provider_allowed_domains (identity_provider_id, email_domain)
                     VALUES (:idpId, :domain)
                     ON CONFLICT DO NOTHING
                     """)
@@ -693,7 +706,7 @@ public class PanacheAggregateRegistry {
     private void persistEmailDomainMapping(EmailDomainMapping mapping) {
         // Insert/update main email_domain_mappings table
         String sql = """
-            INSERT INTO email_domain_mappings (id, email_domain, identity_provider_id, scope_type,
+            INSERT INTO tnt_email_domain_mappings (id, email_domain, identity_provider_id, scope_type,
                 primary_client_id, required_oidc_tenant_id, created_at, updated_at)
             VALUES (:id, :emailDomain, :identityProviderId, :scopeType,
                 :primaryClientId, :requiredOidcTenantId, :createdAt, :updatedAt)
@@ -715,14 +728,14 @@ public class PanacheAggregateRegistry {
             .executeUpdate();
 
         // Handle additional_client_ids junction table
-        em.createNativeQuery("DELETE FROM email_domain_mapping_additional_clients WHERE email_domain_mapping_id = :mappingId")
+        em.createNativeQuery("DELETE FROM tnt_email_domain_mapping_additional_clients WHERE email_domain_mapping_id = :mappingId")
             .setParameter("mappingId", mapping.id)
             .executeUpdate();
 
         if (mapping.additionalClientIds != null && !mapping.additionalClientIds.isEmpty()) {
             for (String clientId : mapping.additionalClientIds) {
                 em.createNativeQuery("""
-                    INSERT INTO email_domain_mapping_additional_clients (email_domain_mapping_id, client_id)
+                    INSERT INTO tnt_email_domain_mapping_additional_clients (email_domain_mapping_id, client_id)
                     VALUES (:mappingId, :clientId)
                     ON CONFLICT DO NOTHING
                     """)
@@ -733,14 +746,14 @@ public class PanacheAggregateRegistry {
         }
 
         // Handle granted_client_ids junction table
-        em.createNativeQuery("DELETE FROM email_domain_mapping_granted_clients WHERE email_domain_mapping_id = :mappingId")
+        em.createNativeQuery("DELETE FROM tnt_email_domain_mapping_granted_clients WHERE email_domain_mapping_id = :mappingId")
             .setParameter("mappingId", mapping.id)
             .executeUpdate();
 
         if (mapping.grantedClientIds != null && !mapping.grantedClientIds.isEmpty()) {
             for (String clientId : mapping.grantedClientIds) {
                 em.createNativeQuery("""
-                    INSERT INTO email_domain_mapping_granted_clients (email_domain_mapping_id, client_id)
+                    INSERT INTO tnt_email_domain_mapping_granted_clients (email_domain_mapping_id, client_id)
                     VALUES (:mappingId, :clientId)
                     ON CONFLICT DO NOTHING
                     """)
@@ -751,14 +764,14 @@ public class PanacheAggregateRegistry {
         }
 
         // Handle allowed_role_ids junction table
-        em.createNativeQuery("DELETE FROM email_domain_mapping_allowed_roles WHERE email_domain_mapping_id = :mappingId")
+        em.createNativeQuery("DELETE FROM tnt_email_domain_mapping_allowed_roles WHERE email_domain_mapping_id = :mappingId")
             .setParameter("mappingId", mapping.id)
             .executeUpdate();
 
         if (mapping.allowedRoleIds != null && !mapping.allowedRoleIds.isEmpty()) {
             for (String roleId : mapping.allowedRoleIds) {
                 em.createNativeQuery("""
-                    INSERT INTO email_domain_mapping_allowed_roles (email_domain_mapping_id, role_id)
+                    INSERT INTO tnt_email_domain_mapping_allowed_roles (email_domain_mapping_id, role_id)
                     VALUES (:mappingId, :roleId)
                     ON CONFLICT DO NOTHING
                     """)
@@ -774,21 +787,20 @@ public class PanacheAggregateRegistry {
     // ========================================================================
 
     private String getTableName(Class<?> clazz) {
-        if (clazz == Application.class) return "applications";
-        if (clazz == ApplicationClientConfig.class) return "application_client_configs";
-        if (clazz == EventType.class) return "event_types";
-        if (clazz == Subscription.class) return "subscriptions";
-        if (clazz == Schema.class) return "schemas";
-        if (clazz == Client.class) return "clients";
-        if (clazz == Principal.class) return "principals";
+        if (clazz == Application.class) return "app_applications";
+        if (clazz == ApplicationClientConfig.class) return "app_client_configs";
+        if (clazz == EventType.class) return "msg_event_types";
+        if (clazz == Subscription.class) return "msg_subscriptions";
+        if (clazz == Client.class) return "tnt_clients";
+        if (clazz == Principal.class) return "iam_principals";
         if (clazz == OAuthClient.class) return "oauth_clients";
-        if (clazz == ServiceAccount.class) return "service_accounts";
-        if (clazz == AuthRole.class) return "auth_roles";
-        if (clazz == AuthPermission.class) return "auth_permissions";
-        if (clazz == DispatchPool.class) return "dispatch_pools";
-        if (clazz == ClientAccessGrant.class) return "client_access_grants";
-        if (clazz == IdentityProvider.class) return "identity_providers";
-        if (clazz == EmailDomainMapping.class) return "email_domain_mappings";
+        if (clazz == ServiceAccount.class) return "iam_service_accounts";
+        if (clazz == AuthRole.class) return "iam_roles";
+        if (clazz == AuthPermission.class) return "iam_permissions";
+        if (clazz == DispatchPool.class) return "msg_dispatch_pools";
+        if (clazz == ClientAccessGrant.class) return "iam_client_access_grants";
+        if (clazz == IdentityProvider.class) return "oauth_identity_providers";
+        if (clazz == EmailDomainMapping.class) return "tnt_email_domain_mappings";
         return null;
     }
 

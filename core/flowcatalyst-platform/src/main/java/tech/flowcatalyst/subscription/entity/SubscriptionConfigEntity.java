@@ -6,7 +6,7 @@ import jakarta.persistence.*;
  * JPA Entity for subscription custom config entries (normalized from embedded array).
  */
 @Entity
-@Table(name = "subscription_configs")
+@Table(name = "msg_subscription_custom_configs")
 public class SubscriptionConfigEntity {
 
     @Id

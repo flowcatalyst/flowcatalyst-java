@@ -48,8 +48,9 @@ public class DispatchJobRead {
     public String eventId;
     public String correlationId;
 
-    // Target (URL only, no headers)
+    // Target
     public String targetUrl;
+    public String connectionId;
     public String protocol;
 
     // Context

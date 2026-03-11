@@ -14,7 +14,7 @@ import java.time.Instant;
  * JPA entity for dispatch_pools table.
  */
 @Entity
-@Table(name = "dispatch_pools",
+@Table(name = "msg_dispatch_pools",
     uniqueConstraints = @UniqueConstraint(columnNames = {"client_id", "code"}))
 public class DispatchPoolEntity {
 

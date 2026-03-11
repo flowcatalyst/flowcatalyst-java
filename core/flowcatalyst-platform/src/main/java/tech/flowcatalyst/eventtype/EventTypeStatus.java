@@ -13,5 +13,5 @@ public enum EventTypeStatus {
      * EventType is archived - no new events can be created.
      * Can only be set when all spec versions are DEPRECATED.
      */
-    ARCHIVE
+    ARCHIVED
 }

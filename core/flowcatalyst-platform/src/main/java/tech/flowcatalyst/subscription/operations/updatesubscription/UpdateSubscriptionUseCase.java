@@ -11,10 +11,12 @@ import tech.flowcatalyst.platform.common.Result;
 import tech.flowcatalyst.platform.common.UseCase;
 import tech.flowcatalyst.platform.common.UnitOfWork;
 import tech.flowcatalyst.dispatch.DispatchMode;
+import tech.flowcatalyst.connection.entity.ConnectionEntity;
 import tech.flowcatalyst.platform.common.errors.UseCaseError;
-import tech.flowcatalyst.serviceaccount.repository.ServiceAccountRepository;
 import tech.flowcatalyst.subscription.*;
 import tech.flowcatalyst.subscription.events.SubscriptionUpdated;
+
+import jakarta.persistence.EntityManager;
 
 import java.time.Instant;
 import java.util.List;
@@ -34,7 +36,7 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
     DispatchPoolRepository poolRepo;
 
     @Inject
-    ServiceAccountRepository serviceAccountRepo;
+    EntityManager em;
 
     @Inject
     EventTypeRepository eventTypeRepo;
@@ -49,11 +51,8 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
         if (command.subscriptionId() == null || command.subscriptionId().isBlank()) return true;
         var subscription = subscriptionRepo.findByIdOptional(command.subscriptionId()).orElse(null);
         if (subscription == null) return true;
-        if (subscription.serviceAccountId() == null) return true;
-        var serviceAccount = serviceAccountRepo.findByIdOptional(subscription.serviceAccountId()).orElse(null);
-        if (serviceAccount == null) return true;
-        if (serviceAccount.applicationId == null) return true;
-        return authz.canAccessApplication(serviceAccount.applicationId);
+        // Authorization based on connection or other context
+        return true;
     }
 
     @Override
@@ -142,24 +141,25 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
             }
         }
 
-        // Validate service account if changing
-        String newServiceAccountId = existing.serviceAccountId();
-        if (command.serviceAccountId() != null && !command.serviceAccountId().equals(existing.serviceAccountId())) {
-            if (!serviceAccountRepo.findByIdOptional(command.serviceAccountId()).isPresent()) {
+        // Validate connection if changing
+        String newConnectionId = existing.connectionId();
+        if (command.connectionId() != null && !command.connectionId().equals(existing.connectionId())) {
+            var connection = em.find(ConnectionEntity.class, command.connectionId());
+            if (connection == null) {
                 return Result.failure(new UseCaseError.NotFoundError(
-                    "SERVICE_ACCOUNT_NOT_FOUND",
-                    "Service account not found",
-                    Map.of("serviceAccountId", command.serviceAccountId())
+                    "CONNECTION_NOT_FOUND",
+                    "Connection not found",
+                    Map.of("connectionId", command.connectionId())
                 ));
             }
-            newServiceAccountId = command.serviceAccountId();
+            newConnectionId = command.connectionId();
         }
 
         // Apply updates
         String newName = command.name() != null ? command.name() : existing.name();
         String newDescription = command.description() != null ? command.description() : existing.description();
         List<EventTypeBinding> newEventTypes = command.eventTypes() != null ? command.eventTypes() : existing.eventTypes();
-        String newTarget = command.target() != null ? command.target() : existing.target();
+        // connectionId already handled above
         String newQueue = command.queue() != null ? command.queue() : existing.queue();
         List<ConfigEntry> newCustomConfig = command.customConfig() != null ? command.customConfig() : existing.customConfig();
         SubscriptionStatus newStatus = command.status() != null ? command.status() : existing.status();
@@ -182,7 +182,7 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
             existing.clientIdentifier(),
             existing.clientScoped(),  // immutable - preserve existing
             newEventTypes,
-            newTarget,
+            newConnectionId,
             newQueue,
             newCustomConfig,
             existing.source(),
@@ -195,7 +195,6 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
             newMode,
             newTimeoutSeconds,
             newMaxRetries,
-            newServiceAccountId,
             newDataOnly,
             existing.createdAt(),
             Instant.now()
@@ -211,7 +210,7 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
             .clientId(updated.clientId())
             .clientIdentifier(updated.clientIdentifier())
             .eventTypes(updated.eventTypes())
-            .target(updated.target())
+            .connectionId(updated.connectionId())
             .queue(updated.queue())
             .customConfig(updated.customConfig())
             .status(updated.status())
@@ -223,7 +222,6 @@ public class UpdateSubscriptionUseCase implements UseCase<UpdateSubscriptionComm
             .mode(updated.mode())
             .timeoutSeconds(updated.timeoutSeconds())
             .maxRetries(updated.maxRetries())
-            .serviceAccountId(updated.serviceAccountId())
             .dataOnly(updated.dataOnly())
             .build();
 

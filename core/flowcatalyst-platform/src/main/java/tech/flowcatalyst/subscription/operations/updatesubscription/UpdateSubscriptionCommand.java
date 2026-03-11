@@ -14,7 +14,7 @@ import java.util.List;
  * @param name New display name (null to keep existing)
  * @param description New description (null to keep existing)
  * @param eventTypes New event type bindings (null to keep existing)
- * @param target New target URL (null to keep existing)
+ * @param connectionId New connection ID (null to keep existing)
  * @param queue New queue name (null to keep existing)
  * @param customConfig New custom config (null to keep existing)
  * @param status New status (null to keep existing)
@@ -25,7 +25,6 @@ import java.util.List;
  * @param mode New mode (null to keep existing)
  * @param timeoutSeconds New timeout (null to keep existing)
  * @param maxRetries New max retries (null to keep existing)
- * @param serviceAccountId New service account ID (null to keep existing)
  * @param dataOnly New dataOnly flag (null to keep existing)
  */
 public record UpdateSubscriptionCommand(
@@ -33,7 +32,7 @@ public record UpdateSubscriptionCommand(
     String name,
     String description,
     List<EventTypeBinding> eventTypes,
-    String target,
+    String connectionId,
     String queue,
     List<ConfigEntry> customConfig,
     SubscriptionStatus status,
@@ -44,6 +43,5 @@ public record UpdateSubscriptionCommand(
     DispatchMode mode,
     Integer timeoutSeconds,
     Integer maxRetries,
-    String serviceAccountId,
     Boolean dataOnly
 ) {}

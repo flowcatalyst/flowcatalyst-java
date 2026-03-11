@@ -65,8 +65,8 @@ public record Subscription(
     /** List of event types this subscription listens to */
     List<EventTypeBinding> eventTypes,
 
-    /** Target URL for dispatching (HTTP endpoint) */
-    String target,
+    /** Connection ID linking to msg_connections (holds endpoint, service account, etc.) */
+    String connectionId,
 
     /** Queue name for message routing */
     String queue,
@@ -103,14 +103,6 @@ public record Subscription(
 
     /** Maximum retry attempts for failed dispatch jobs (default 3) */
     int maxRetries,
-
-    /**
-     * Service account ID for webhook credentials.
-     *
-     * <p>The ServiceAccount contains embedded webhook credentials
-     * (auth token, signing secret) used for authenticating dispatch requests.</p>
-     */
-    String serviceAccountId,
 
     /**
      * Controls payload delivery format for dispatch jobs created by this subscription.
@@ -208,18 +200,18 @@ public record Subscription(
      * @param code            Unique code within client scope
      * @param applicationCode Application/module code that owns this subscription
      * @param name            Display name
-     * @param target          Target URL for dispatching
+     * @param connectionId    Connection ID for endpoint and credentials
      * @param clientScoped    Whether this subscription is scoped to clients
      * @return A pre-configured builder with defaults set
      */
-    public static SubscriptionBuilder create(String code, String applicationCode, String name, String target, boolean clientScoped) {
+    public static SubscriptionBuilder create(String code, String applicationCode, String name, String connectionId, boolean clientScoped) {
         var now = Instant.now();
         return Subscription.builder()
             .id(TsidGenerator.generate(EntityType.SUBSCRIPTION))
             .code(code.toLowerCase())
             .applicationCode(applicationCode)
             .name(name)
-            .target(target)
+            .connectionId(connectionId)
             .clientScoped(clientScoped)
             .eventTypes(new ArrayList<>())
             .customConfig(new ArrayList<>())

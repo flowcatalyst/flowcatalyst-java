@@ -66,7 +66,7 @@ public class PrincipalReadRepository implements PrincipalRepository {
     public Optional<Principal> findByServiceAccountCode(String code) {
         @SuppressWarnings("unchecked")
         List<PrincipalEntity> results = em.createNativeQuery(
-                "SELECT * FROM principals WHERE service_account->>'code' = :code",
+                "SELECT * FROM iam_principals WHERE service_account->>'code' = :code",
                 PrincipalEntity.class)
             .setParameter("code", code)
             .getResultList();
@@ -235,7 +235,7 @@ public class PrincipalReadRepository implements PrincipalRepository {
     public Optional<Principal> findByServiceAccountClientId(String clientId) {
         @SuppressWarnings("unchecked")
         List<PrincipalEntity> results = em.createNativeQuery(
-                "SELECT * FROM principals WHERE type = 'SERVICE' AND service_account->>'clientId' = :clientId",
+                "SELECT * FROM iam_principals WHERE type = 'SERVICE' AND service_account->>'clientId' = :clientId",
                 PrincipalEntity.class)
             .setParameter("clientId", clientId)
             .getResultList();

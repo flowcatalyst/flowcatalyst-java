@@ -8,7 +8,7 @@ import java.time.Instant;
  * JPA Entity for dispatch_jobs_read table (read-optimized projection).
  */
 @Entity
-@Table(name = "dispatch_jobs_read")
+@Table(name = "msg_dispatch_jobs_read")
 public class DispatchJobReadEntity {
 
     @Id
@@ -21,7 +21,7 @@ public class DispatchJobReadEntity {
     @Column(name = "external_id", length = 100)
     public String externalId;
 
-    @Column(name = "source", length = 100)
+    @Column(name = "source", length = 500)
     public String source;
 
     @Column(name = "kind", length = 20)
@@ -30,7 +30,7 @@ public class DispatchJobReadEntity {
     @Column(name = "code", length = 200)
     public String code;
 
-    @Column(name = "subject", length = 200)
+    @Column(name = "subject", length = 500)
     public String subject;
 
     // Parsed code segments for filtering
@@ -43,15 +43,18 @@ public class DispatchJobReadEntity {
     @Column(name = "aggregate", length = 100)
     public String aggregate;
 
-    @Column(name = "event_id", length = 17)
+    @Column(name = "event_id", length = 13)
     public String eventId;
 
     @Column(name = "correlation_id", length = 100)
     public String correlationId;
 
     // Target
-    @Column(name = "target_url", length = 2048)
+    @Column(name = "target_url", length = 500)
     public String targetUrl;
+
+    @Column(name = "connection_id", length = 17)
+    public String connectionId;
 
     @Column(name = "protocol", length = 30)
     public String protocol;

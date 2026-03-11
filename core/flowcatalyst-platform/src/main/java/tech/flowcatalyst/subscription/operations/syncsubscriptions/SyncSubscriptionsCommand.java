@@ -26,7 +26,7 @@ public record SyncSubscriptionsCommand(
         String description,
         Boolean clientScoped,
         List<EventTypeBindingItem> eventTypes,
-        String target,
+        String connectionId,
         String queue,
         List<ConfigEntry> customConfig,
         Integer maxAgeSeconds,

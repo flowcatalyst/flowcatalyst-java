@@ -19,7 +19,7 @@ import java.time.Instant;
  * The normalized principal_roles table is the source of truth for roles.
  */
 @Entity
-@Table(name = "principals")
+@Table(name = "iam_principals")
 public class PrincipalEntity {
 
     @Id
