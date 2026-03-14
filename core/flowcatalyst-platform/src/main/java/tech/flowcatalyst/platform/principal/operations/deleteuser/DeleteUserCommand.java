@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.deleteuser;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete a user.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.platform.principal.operations.deleteuser;
  */
 public record DeleteUserCommand(
     String userId
-) {}
+) implements Command {}

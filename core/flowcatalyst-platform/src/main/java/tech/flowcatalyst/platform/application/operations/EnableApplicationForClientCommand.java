@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.application.operations;
 
 import java.util.Map;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to enable an application for a client.
@@ -17,7 +18,7 @@ public record EnableApplicationForClientCommand(
     String baseUrlOverride,
     String websiteOverride,
     Map<String, Object> configJson
-) {
+) implements Command {
     /**
      * Constructor without websiteOverride/configJson for backwards compatibility.
      */

@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.updateuser;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to update a user.
  *
@@ -11,4 +13,4 @@ public record UpdateUserCommand(
     String userId,
     String name,
     String clientId
-) {}
+) implements Command {}

@@ -6,6 +6,7 @@ import tech.flowcatalyst.platform.authorization.PermissionInput;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new Role.
@@ -28,7 +29,7 @@ public record CreateRoleCommand(
     List<PermissionInput> permissions,
     AuthRole.RoleSource source,
     boolean clientManaged
-) {
+) implements Command {
     /**
      * Build permission strings from structured inputs.
      *

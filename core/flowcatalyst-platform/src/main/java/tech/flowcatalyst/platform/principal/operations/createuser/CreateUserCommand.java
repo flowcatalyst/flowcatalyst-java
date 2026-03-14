@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.createuser;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to create a new user.
  *
@@ -13,4 +15,4 @@ public record CreateUserCommand(
     String password,
     String name,
     String clientId
-) {}
+) implements Command {}

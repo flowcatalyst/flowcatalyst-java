@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.application.operations.updateapplication;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to update an Application.
  *
@@ -21,7 +23,7 @@ public record UpdateApplicationCommand(
     String website,
     String logo,
     String logoMimeType
-) {
+) implements Command {
     /**
      * Constructor without website/logo for backwards compatibility.
      */

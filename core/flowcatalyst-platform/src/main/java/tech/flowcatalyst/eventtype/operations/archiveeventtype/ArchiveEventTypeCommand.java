@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.archiveeventtype;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to archive an EventType.
  *
@@ -10,4 +12,4 @@ package tech.flowcatalyst.eventtype.operations.archiveeventtype;
  */
 public record ArchiveEventTypeCommand(
     String eventTypeId
-) {}
+) implements Command {}

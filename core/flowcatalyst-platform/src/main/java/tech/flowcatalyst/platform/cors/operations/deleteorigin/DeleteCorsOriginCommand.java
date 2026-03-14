@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.cors.operations.deleteorigin;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete a CORS allowed origin.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.platform.cors.operations.deleteorigin;
  */
 public record DeleteCorsOriginCommand(
     String originId
-) {}
+) implements Command {}

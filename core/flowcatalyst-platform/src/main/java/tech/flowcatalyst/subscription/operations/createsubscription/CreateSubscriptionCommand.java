@@ -6,6 +6,7 @@ import tech.flowcatalyst.subscription.EventTypeBinding;
 import tech.flowcatalyst.subscription.SubscriptionSource;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new subscription.
@@ -50,4 +51,4 @@ public record CreateSubscriptionCommand(
     Integer timeoutSeconds,
     Integer maxRetries,
     Boolean dataOnly
-) {}
+) implements Command {}

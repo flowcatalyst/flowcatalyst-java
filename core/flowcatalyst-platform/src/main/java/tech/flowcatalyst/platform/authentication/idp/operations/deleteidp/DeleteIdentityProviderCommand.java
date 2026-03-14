@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.authentication.idp.operations.deleteidp;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete an Identity Provider.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.platform.authentication.idp.operations.deleteidp;
  */
 public record DeleteIdentityProviderCommand(
     String identityProviderId
-) {}
+) implements Command {}

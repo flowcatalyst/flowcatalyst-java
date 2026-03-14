@@ -5,6 +5,7 @@ import tech.flowcatalyst.platform.authorization.PermissionInput;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to bulk sync roles from an external application (SDK).
@@ -17,7 +18,7 @@ public record SyncRolesCommand(
     String applicationId,
     List<SyncRoleItem> roles,
     boolean removeUnlisted
-) {
+) implements Command {
     /**
      * Individual role item in a sync operation.
      *

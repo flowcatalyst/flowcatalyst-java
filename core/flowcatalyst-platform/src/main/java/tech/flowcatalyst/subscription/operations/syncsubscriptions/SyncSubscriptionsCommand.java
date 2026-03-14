@@ -4,6 +4,7 @@ import tech.flowcatalyst.dispatch.DispatchMode;
 import tech.flowcatalyst.subscription.ConfigEntry;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to bulk sync subscriptions from an external application (SDK).
@@ -16,7 +17,7 @@ public record SyncSubscriptionsCommand(
     String applicationCode,
     List<SyncSubscriptionItem> subscriptions,
     boolean removeUnlisted
-) {
+) implements Command {
     /**
      * Individual subscription item in a sync operation.
      */

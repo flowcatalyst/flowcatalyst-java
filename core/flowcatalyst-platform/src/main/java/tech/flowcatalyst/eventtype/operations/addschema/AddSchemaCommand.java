@@ -1,6 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.addschema;
 
 import tech.flowcatalyst.eventtype.SchemaType;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to add a new schema version to an EventType.
@@ -20,4 +21,4 @@ public record AddSchemaCommand(
     String mimeType,
     String schema,
     SchemaType schemaType
-) {}
+) implements Command {}

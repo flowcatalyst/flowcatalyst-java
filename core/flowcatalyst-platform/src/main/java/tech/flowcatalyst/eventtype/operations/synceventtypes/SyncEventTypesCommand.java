@@ -1,6 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.synceventtypes;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to bulk sync event types from an external application (SDK).
@@ -13,7 +14,7 @@ public record SyncEventTypesCommand(
     String applicationCode,
     List<SyncEventTypeItem> eventTypes,
     boolean removeUnlisted
-) {
+) implements Command {
     /**
      * Individual event type item in a sync operation.
      *

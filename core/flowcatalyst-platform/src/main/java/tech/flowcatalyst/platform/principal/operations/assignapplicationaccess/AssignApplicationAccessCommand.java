@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.assignapplicationaccess;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command for assigning application access to a user.
@@ -15,4 +16,4 @@ import java.util.List;
 public record AssignApplicationAccessCommand(
     String userId,
     List<String> applicationIds
-) {}
+) implements Command {}

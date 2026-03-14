@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.deprecateschema;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to deprecate a schema version.
  *
@@ -13,4 +15,4 @@ package tech.flowcatalyst.eventtype.operations.deprecateschema;
 public record DeprecateSchemaCommand(
     String eventTypeId,
     String version
-) {}
+) implements Command {}

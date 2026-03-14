@@ -6,6 +6,7 @@ import tech.flowcatalyst.subscription.EventTypeBinding;
 import tech.flowcatalyst.subscription.SubscriptionStatus;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update an existing subscription.
@@ -44,4 +45,4 @@ public record UpdateSubscriptionCommand(
     Integer timeoutSeconds,
     Integer maxRetries,
     Boolean dataOnly
-) {}
+) implements Command {}

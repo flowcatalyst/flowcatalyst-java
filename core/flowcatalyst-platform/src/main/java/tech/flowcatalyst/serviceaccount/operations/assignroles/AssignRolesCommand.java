@@ -1,6 +1,7 @@
 package tech.flowcatalyst.serviceaccount.operations.assignroles;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to assign roles to a service account.
@@ -12,4 +13,4 @@ import java.util.List;
 public record AssignRolesCommand(
     String serviceAccountId,
     List<String> roleNames
-) {}
+) implements Command {}

@@ -1,5 +1,7 @@
 package tech.flowcatalyst.dispatchpool.operations.createpool;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to create a new dispatch pool.
  *
@@ -17,4 +19,4 @@ public record CreateDispatchPoolCommand(
     int rateLimit,
     int concurrency,
     String clientId
-) {}
+) implements Command {}

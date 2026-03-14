@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.authentication.domain.operations.deletemapping;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete an Email Domain Mapping.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.platform.authentication.domain.operations.deletemappin
  */
 public record DeleteEmailDomainMappingCommand(
     String emailDomainMappingId
-) {}
+) implements Command {}

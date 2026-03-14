@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.assignroles;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to assign roles to a user.
@@ -15,4 +16,4 @@ import java.util.List;
 public record AssignRolesCommand(
     String userId,
     List<String> roles
-) {}
+) implements Command {}

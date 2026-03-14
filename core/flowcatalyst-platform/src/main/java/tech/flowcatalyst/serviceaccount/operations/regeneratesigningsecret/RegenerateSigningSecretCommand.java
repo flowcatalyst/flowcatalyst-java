@@ -1,5 +1,7 @@
 package tech.flowcatalyst.serviceaccount.operations.regeneratesigningsecret;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to regenerate a service account's signing secret.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.serviceaccount.operations.regeneratesigningsecret;
  */
 public record RegenerateSigningSecretCommand(
     String serviceAccountId
-) {}
+) implements Command {}

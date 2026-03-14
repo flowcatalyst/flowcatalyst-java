@@ -1,6 +1,7 @@
 package tech.flowcatalyst.serviceaccount.operations.createserviceaccount;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new service account.
@@ -17,4 +18,4 @@ public record CreateServiceAccountCommand(
     String description,
     List<String> clientIds,
     String applicationId
-) {}
+) implements Command {}

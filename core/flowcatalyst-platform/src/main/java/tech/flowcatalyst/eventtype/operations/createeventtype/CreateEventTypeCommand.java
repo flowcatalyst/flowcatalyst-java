@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.createeventtype;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to create a new EventType.
  *
@@ -25,7 +27,7 @@ public record CreateEventTypeCommand(
     String name,
     String description,
     boolean clientScoped
-) {
+) implements Command {
     /**
      * Build the full event type code from segments.
      *

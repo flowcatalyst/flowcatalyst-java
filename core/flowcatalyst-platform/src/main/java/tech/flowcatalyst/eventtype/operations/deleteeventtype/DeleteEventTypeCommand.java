@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.deleteeventtype;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete an EventType.
  *
@@ -14,4 +16,4 @@ package tech.flowcatalyst.eventtype.operations.deleteeventtype;
  */
 public record DeleteEventTypeCommand(
     String eventTypeId
-) {}
+) implements Command {}

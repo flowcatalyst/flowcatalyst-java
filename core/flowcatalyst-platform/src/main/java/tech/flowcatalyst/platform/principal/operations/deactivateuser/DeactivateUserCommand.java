@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.deactivateuser;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to deactivate a user.
  *
@@ -9,4 +11,4 @@ package tech.flowcatalyst.platform.principal.operations.deactivateuser;
 public record DeactivateUserCommand(
     String userId,
     String reason
-) {}
+) implements Command {}

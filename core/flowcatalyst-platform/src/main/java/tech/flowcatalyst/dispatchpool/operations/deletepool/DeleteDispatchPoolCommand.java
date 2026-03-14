@@ -1,5 +1,7 @@
 package tech.flowcatalyst.dispatchpool.operations.deletepool;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete (archive) an existing dispatch pool.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.dispatchpool.operations.deletepool;
  */
 public record DeleteDispatchPoolCommand(
     String poolId
-) {}
+) implements Command {}

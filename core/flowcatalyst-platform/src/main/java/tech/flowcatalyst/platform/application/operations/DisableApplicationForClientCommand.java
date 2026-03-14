@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.application.operations;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to disable an application for a client.
  *
@@ -9,4 +11,4 @@ package tech.flowcatalyst.platform.application.operations;
 public record DisableApplicationForClientCommand(
     String applicationId,
     String clientId
-) {}
+) implements Command {}

@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.cors.operations.addorigin;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to add a new CORS allowed origin.
  *
@@ -9,4 +11,4 @@ package tech.flowcatalyst.platform.cors.operations.addorigin;
 public record AddCorsOriginCommand(
     String origin,
     String description
-) {}
+) implements Command {}

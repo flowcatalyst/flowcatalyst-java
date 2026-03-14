@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.activateuser;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to activate a user.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.platform.principal.operations.activateuser;
  */
 public record ActivateUserCommand(
     String userId
-) {}
+) implements Command {}

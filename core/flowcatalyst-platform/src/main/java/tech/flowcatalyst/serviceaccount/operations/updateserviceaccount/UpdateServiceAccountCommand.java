@@ -1,6 +1,7 @@
 package tech.flowcatalyst.serviceaccount.operations.updateserviceaccount;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update a service account's metadata.
@@ -15,4 +16,4 @@ public record UpdateServiceAccountCommand(
     String name,
     String description,
     List<String> clientIds
-) {}
+) implements Command {}

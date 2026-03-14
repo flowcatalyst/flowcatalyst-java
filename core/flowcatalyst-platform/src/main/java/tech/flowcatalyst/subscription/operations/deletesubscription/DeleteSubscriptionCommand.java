@@ -1,5 +1,7 @@
 package tech.flowcatalyst.subscription.operations.deletesubscription;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to delete an existing subscription.
  *
@@ -7,4 +9,4 @@ package tech.flowcatalyst.subscription.operations.deletesubscription;
  */
 public record DeleteSubscriptionCommand(
     String subscriptionId
-) {}
+) implements Command {}

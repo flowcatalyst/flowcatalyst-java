@@ -14,6 +14,8 @@ import tech.flowcatalyst.dispatchjob.entity.DispatchJobMetadata;
 import tech.flowcatalyst.event.ContextData;
 import tech.flowcatalyst.event.Event;
 import tech.flowcatalyst.event.EventDispatchService;
+import tech.flowcatalyst.platform.common.Aggregate;
+import tech.flowcatalyst.platform.common.Command;
 import tech.flowcatalyst.platform.common.DomainEvent;
 import tech.flowcatalyst.platform.common.Result;
 import tech.flowcatalyst.platform.common.UnitOfWork;
@@ -65,10 +67,10 @@ public class PanacheTransactionalUnitOfWork implements UnitOfWork {
 
     @Override
     @Transactional
-    public <T extends DomainEvent> Result<T> commit(
-            Object aggregate,
+    public <T extends DomainEvent, A extends Aggregate, C extends Command> Result<T> commit(
+            A aggregate,
             T event,
-            Object command
+            C command
     ) {
         try {
             // 1. Persist/update aggregate
@@ -106,10 +108,10 @@ public class PanacheTransactionalUnitOfWork implements UnitOfWork {
 
     @Override
     @Transactional
-    public <T extends DomainEvent> Result<T> commitDelete(
-            Object aggregate,
+    public <T extends DomainEvent, A extends Aggregate, C extends Command> Result<T> commitDelete(
+            A aggregate,
             T event,
-            Object command
+            C command
     ) {
         try {
             // 1. Delete aggregate
@@ -145,10 +147,10 @@ public class PanacheTransactionalUnitOfWork implements UnitOfWork {
 
     @Override
     @Transactional
-    public <T extends DomainEvent> Result<T> commitAll(
-            List<Object> aggregates,
+    public <T extends DomainEvent, C extends Command> Result<T> commitAll(
+            List<? extends Aggregate> aggregates,
             T event,
-            Object command
+            C command
     ) {
         try {
             // 1. Persist/update all aggregates
@@ -187,10 +189,10 @@ public class PanacheTransactionalUnitOfWork implements UnitOfWork {
 
     @Override
     @Transactional
-    public <T extends DomainEvent> Result<T> commitDeleteAll(
-            List<Object> aggregates,
+    public <T extends DomainEvent, C extends Command> Result<T> commitDeleteAll(
+            List<? extends Aggregate> aggregates,
             T event,
-            Object command
+            C command
     ) {
         try {
             // 1. Delete all aggregates

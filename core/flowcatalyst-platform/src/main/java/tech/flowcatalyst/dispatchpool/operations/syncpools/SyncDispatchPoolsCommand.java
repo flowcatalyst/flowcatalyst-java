@@ -1,6 +1,7 @@
 package tech.flowcatalyst.dispatchpool.operations.syncpools;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to bulk sync dispatch pools from an external application (SDK).
@@ -13,7 +14,7 @@ public record SyncDispatchPoolsCommand(
     String applicationCode,
     List<SyncPoolItem> pools,
     boolean removeUnlisted
-) {
+) implements Command {
     /**
      * Individual pool item in a sync operation.
      *

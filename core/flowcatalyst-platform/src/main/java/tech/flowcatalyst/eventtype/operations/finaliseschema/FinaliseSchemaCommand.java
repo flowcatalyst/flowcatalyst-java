@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.finaliseschema;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to finalise a schema version.
  *
@@ -13,4 +15,4 @@ package tech.flowcatalyst.eventtype.operations.finaliseschema;
 public record FinaliseSchemaCommand(
     String eventTypeId,
     String version
-) {}
+) implements Command {}

@@ -3,6 +3,7 @@ package tech.flowcatalyst.platform.authentication.idp.operations.createidp;
 import tech.flowcatalyst.platform.authentication.idp.IdentityProviderType;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new Identity Provider.
@@ -27,4 +28,4 @@ public record CreateIdentityProviderCommand(
     boolean oidcMultiTenant,
     String oidcIssuerPattern,
     List<String> allowedEmailDomains
-) {}
+) implements Command {}

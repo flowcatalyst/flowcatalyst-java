@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.grantclientaccess;
 
 import java.time.Instant;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to grant a user access to a client.
@@ -13,4 +14,4 @@ public record GrantClientAccessCommand(
     String userId,
     String clientId,
     Instant expiresAt
-) {}
+) implements Command {}

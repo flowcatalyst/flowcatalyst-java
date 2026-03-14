@@ -1,5 +1,7 @@
 package tech.flowcatalyst.serviceaccount.operations.regenerateauthtoken;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to regenerate a service account's auth token.
  *
@@ -9,7 +11,7 @@ package tech.flowcatalyst.serviceaccount.operations.regenerateauthtoken;
 public record RegenerateAuthTokenCommand(
     String serviceAccountId,
     String customToken
-) {
+) implements Command {
     public static RegenerateAuthTokenCommand generate(String serviceAccountId) {
         return new RegenerateAuthTokenCommand(serviceAccountId, null);
     }

@@ -1,5 +1,7 @@
 package tech.flowcatalyst.eventtype.operations.updateeventtype;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to update an EventType's metadata.
  *
@@ -14,4 +16,4 @@ public record UpdateEventTypeCommand(
     String eventTypeId,
     String name,
     String description
-) {}
+) implements Command {}

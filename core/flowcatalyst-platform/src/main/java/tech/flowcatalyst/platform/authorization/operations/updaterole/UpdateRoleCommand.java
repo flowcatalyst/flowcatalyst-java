@@ -5,6 +5,7 @@ import tech.flowcatalyst.platform.authorization.PermissionInput;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update a Role.
@@ -23,7 +24,7 @@ public record UpdateRoleCommand(
     String description,
     List<PermissionInput> permissions,
     Boolean clientManaged
-) {
+) implements Command {
     /**
      * Build permission strings from structured inputs.
      *

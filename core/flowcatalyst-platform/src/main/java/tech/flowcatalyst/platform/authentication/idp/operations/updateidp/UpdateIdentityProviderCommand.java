@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.authentication.idp.operations.updateidp;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update an Identity Provider.
@@ -23,4 +24,4 @@ public record UpdateIdentityProviderCommand(
     Boolean oidcMultiTenant,
     String oidcIssuerPattern,
     List<String> allowedEmailDomains
-) {}
+) implements Command {}

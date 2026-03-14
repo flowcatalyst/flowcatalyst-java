@@ -35,10 +35,10 @@ import java.util.Map;
  * }
  * }</pre>
  *
- * @param <C> The command type
+ * @param <C> The command type (must implement {@link Command})
  * @param <E> The domain event type (must extend {@link DomainEvent})
  */
-public interface UseCase<C, E extends DomainEvent> {
+public interface UseCase<C extends Command, E extends DomainEvent> {
 
     /**
      * Execute the use case with resource-level authorization.

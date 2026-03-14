@@ -56,16 +56,18 @@ public interface UnitOfWork {
      *
      * <p>If any step fails, the entire transaction is rolled back.
      *
-     * @param aggregate The entity to persist (must have public Long id field)
+     * @param aggregate The entity to persist
      * @param event     The domain event representing what happened
      * @param command   The command that was executed (for audit log)
      * @param <T>       The domain event type
+     * @param <A>       The aggregate type
+     * @param <C>       The command type
      * @return Success with the event, or Failure if transaction fails
      */
-    <T extends DomainEvent> Result<T> commit(
-        Object aggregate,
+    <T extends DomainEvent, A extends Aggregate, C extends Command> Result<T> commit(
+        A aggregate,
         T event,
-        Object command
+        C command
     );
 
     /**
@@ -78,16 +80,18 @@ public interface UnitOfWork {
      *   <li>Creates the audit log entry</li>
      * </ol>
      *
-     * @param aggregate The entity to delete (must have public Long id field)
+     * @param aggregate The entity to delete
      * @param event     The domain event representing the deletion
      * @param command   The command that was executed (for audit log)
      * @param <T>       The domain event type
+     * @param <A>       The aggregate type
+     * @param <C>       The command type
      * @return Success with the event, or Failure if transaction fails
      */
-    <T extends DomainEvent> Result<T> commitDelete(
-        Object aggregate,
+    <T extends DomainEvent, A extends Aggregate, C extends Command> Result<T> commitDelete(
+        A aggregate,
         T event,
-        Object command
+        C command
     );
 
     /**
@@ -111,10 +115,10 @@ public interface UnitOfWork {
      * @param <T>        The domain event type
      * @return Success with the event, or Failure if transaction fails
      */
-    <T extends DomainEvent> Result<T> commitAll(
-        java.util.List<Object> aggregates,
+    <T extends DomainEvent, C extends Command> Result<T> commitAll(
+        java.util.List<? extends Aggregate> aggregates,
         T event,
-        Object command
+        C command
     );
 
     /**
@@ -138,9 +142,9 @@ public interface UnitOfWork {
      * @param <T>        The domain event type
      * @return Success with the event, or Failure if transaction fails
      */
-    <T extends DomainEvent> Result<T> commitDeleteAll(
-        java.util.List<Object> aggregates,
+    <T extends DomainEvent, C extends Command> Result<T> commitDeleteAll(
+        java.util.List<? extends Aggregate> aggregates,
         T event,
-        Object command
+        C command
     );
 }

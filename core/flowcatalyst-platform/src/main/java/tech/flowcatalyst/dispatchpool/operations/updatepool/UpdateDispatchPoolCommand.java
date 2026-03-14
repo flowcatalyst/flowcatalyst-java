@@ -1,6 +1,7 @@
 package tech.flowcatalyst.dispatchpool.operations.updatepool;
 
 import tech.flowcatalyst.dispatchpool.DispatchPoolStatus;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update an existing dispatch pool.
@@ -19,4 +20,4 @@ public record UpdateDispatchPoolCommand(
     Integer rateLimit,
     Integer concurrency,
     DispatchPoolStatus status
-) {}
+) implements Command {}

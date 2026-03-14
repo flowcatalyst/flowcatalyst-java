@@ -3,6 +3,7 @@ package tech.flowcatalyst.platform.authentication.domain.operations.updatemappin
 import tech.flowcatalyst.platform.authentication.domain.ScopeType;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to update an Email Domain Mapping.
@@ -27,4 +28,4 @@ public record UpdateEmailDomainMappingCommand(
     String requiredOidcTenantId,
     List<String> allowedRoleIds,
     Boolean syncRolesFromIdp
-) {}
+) implements Command {}

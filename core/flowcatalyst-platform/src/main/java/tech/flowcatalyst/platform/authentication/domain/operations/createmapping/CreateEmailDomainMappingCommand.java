@@ -3,6 +3,7 @@ package tech.flowcatalyst.platform.authentication.domain.operations.createmappin
 import tech.flowcatalyst.platform.authentication.domain.ScopeType;
 
 import java.util.List;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new Email Domain Mapping.
@@ -27,4 +28,4 @@ public record CreateEmailDomainMappingCommand(
     String requiredOidcTenantId,
     List<String> allowedRoleIds,
     boolean syncRolesFromIdp
-) {}
+) implements Command {}

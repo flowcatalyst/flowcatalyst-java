@@ -1,5 +1,7 @@
 package tech.flowcatalyst.platform.principal.operations.revokeclientaccess;
 
+import tech.flowcatalyst.platform.common.Command;
+
 /**
  * Command to revoke a user's access to a client.
  *
@@ -9,4 +11,4 @@ package tech.flowcatalyst.platform.principal.operations.revokeclientaccess;
 public record RevokeClientAccessCommand(
     String userId,
     String clientId
-) {}
+) implements Command {}

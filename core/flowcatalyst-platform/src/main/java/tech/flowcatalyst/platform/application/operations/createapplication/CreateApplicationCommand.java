@@ -1,6 +1,7 @@
 package tech.flowcatalyst.platform.application.operations.createapplication;
 
 import tech.flowcatalyst.platform.application.Application;
+import tech.flowcatalyst.platform.common.Command;
 
 /**
  * Command to create a new Application.
@@ -27,7 +28,7 @@ public record CreateApplicationCommand(
     String logoMimeType,
     Application.ApplicationType type,
     boolean provisionServiceAccount
-) {
+) implements Command {
     /**
      * Constructor with defaults for backwards compatibility.
      */
